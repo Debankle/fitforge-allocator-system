@@ -39,14 +39,33 @@ class CoreService {
 
   calculate_b_values(): void {
     for (let i = 0; i < this.num_teams; i++) {
+      this.b_values[i] = [];
       for (let j = 0; j < this.num_projects; j++) {
-        console.log(i, j);
         this.b_values[i][j] =
           this.fit_scalar * this.fit_values[i][j] +
           this.preference_scalar * this.preference_values[i][j];
-        console.log(this.b_values[i][j]);
       }
     }
+  }
+
+  initialise_values(props: Setup): void {
+    this.fit_values = props.fit_vals;
+    this.preference_values = props.pref_vals;
+    this.num_teams_to_project = props.num_teams_to_project;
+    this.num_teams = this.fit_values.length;
+    this.num_projects = this.fit_values[0].length;
+    this.soft_reset();
+    console.log(this.b_values);
+  }
+
+  set_fit_scalar(fit_scale: number): void {
+    this.fit_scalar = fit_scale;
+    this.calculate_b_values();
+  }
+
+  set_pref_scalar(pref_scale: number): void {
+    this.preference_scalar = pref_scale;
+    this.calculate_b_values();
   }
 
   get_allocations(): number[][] {
@@ -60,30 +79,15 @@ class CoreService {
   run_algorithm(algorithm: string): number[][] {
     let allocation_set: number[][] = [];
     if (algorithm == "IPL") {
-      allocation_set = IPLAllocator(this.b_values);
+      const alloc_set = IPLAllocator(
+        this.b_values,
+        this.allocations,
+        this.rejections,
+        this.num_teams_to_project
+      );
+      console.log(alloc_set);
     }
     return allocation_set;
-  }
-
-  initialise_values(props: Setup): void {
-    this.fit_values = props.fit_vals;
-    this.preference_values = props.pref_vals;
-    console.log(this.fit_values);
-    console.log(this.preference_values);
-    this.num_teams_to_project = props.num_teams_to_project;
-    this.num_teams = this.fit_values.length;
-    this.num_projects = this.fit_values[0].length;
-    this.soft_reset();
-  }
-
-  set_fit_scalar(fit_scale: number): void {
-    this.fit_scalar = fit_scale;
-    this.calculate_b_values();
-  }
-
-  set_pref_scalar(pref_scale: number): void {
-    this.preference_scalar = pref_scale;
-    this.calculate_b_values();
   }
 }
 
