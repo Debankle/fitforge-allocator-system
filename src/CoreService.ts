@@ -1,5 +1,6 @@
 import ILPAllocator from "./algorithms/ILP";
-import { Setup } from "./interfaces";
+import { Setup, State } from "./interfaces";
+import StateSaver from "./StateIO";
 
 class CoreService {
   /*
@@ -18,6 +19,25 @@ class CoreService {
   private rejections: number[][] = [[]];
   private num_teams: number = 0;
   private num_projects: number = 0;
+
+  saveState(filePath: string): void {
+    const currentState: State = {
+        fit_values: this.fit_values,
+        preference_values: this.preference_values,
+        fit_scalar: this.fit_scalar,
+        preference_scalar: this.preference_scalar,
+        num_teams_to_project: this.num_teams_to_project,
+        allocations: this.allocations,
+        rejections: this.rejections
+    }
+    StateSaver.save(filePath, currentState);
+  }
+
+  loadState(filePath: string): void {
+    const newState: State = StateSaver.load(filePath);
+    console.log(newState);
+    // Hard Reset and then load in the data
+  }
 
   hard_reset(): void {
     this.b_values = [[]];
