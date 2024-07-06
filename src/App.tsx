@@ -1,5 +1,6 @@
 import { useState } from "react";
 import InputComponent from "./components/InputComponent";
+import Toolbar from "./components/Toolbar";
 
 function App() {
   // NOTE: Rewrite this to be a function state so data can be passed as needed idk if thats needed
@@ -19,6 +20,8 @@ function App() {
   };
   return (
     <>
+        <Toolbar />
+
       <h1 className="text-blue-500 text-center">Testing</h1>
 
       {/* Plans for this section
