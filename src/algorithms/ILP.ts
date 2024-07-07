@@ -12,7 +12,7 @@ interface AllocatorReturn {
     [key: string]: boolean | number| boolean | number[];
 }
 
-const IPLAllocator = (bvalues: number[][], allocations: number[][], rejections: number[][], allocNums: number[]): AllocatorReturn => {
+const ILPAllocator = (bvalues: number[][], allocations: number[][], rejections: number[][], allocNums: number[]): AllocatorReturn => {
     const m = bvalues.length;
     const n = bvalues[0].length;
     const constraints: Constraints = {};
@@ -58,4 +58,4 @@ const IPLAllocator = (bvalues: number[][], allocations: number[][], rejections: 
     return solver.Solve(model);
 };
 
-export default IPLAllocator;
+export default ILPAllocator;
