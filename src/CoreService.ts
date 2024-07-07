@@ -1,4 +1,4 @@
-import IPLAllocator from "./algorithms/IPL";
+import ILPAllocator from "./algorithms/ILP";
 import { Setup } from "./interfaces";
 
 class CoreService {
@@ -79,8 +79,8 @@ class CoreService {
 
   run_algorithm(algorithm: string): number[][] {
     let allocation_set: number[][] = [];
-    if (algorithm == "IPL") {
-      const alloc_set = IPLAllocator(
+    if (algorithm == "ILP") {
+      const alloc_set = ILPAllocator(
         this.b_values,
         this.allocations,
         this.rejections,

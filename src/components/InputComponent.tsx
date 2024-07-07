@@ -63,7 +63,7 @@ function InputComponent() {
           num_teams_to_project: n,
         };
         coreService.initialise_values(setupParams);
-        coreService.run_algorithm("IPL");
+        coreService.run_algorithm("ILP");
       });
     }
   };
