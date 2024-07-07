@@ -1,6 +1,7 @@
 import { useState } from "react";
 import InputComponent from "./components/InputComponent";
 import Toolbar from "./components/Toolbar";
+import ViewToolbar from "./components/ViewToolbar";
 
 function App() {
   // NOTE: Rewrite this to be a function state so data can be passed as needed idk if thats needed
@@ -13,16 +14,17 @@ function App() {
     */
     switch (activeComponent) {
       case "Upload":
-        return <div>Upload view</div>;
+        return <InputComponent />;
+      case "Algorithm":
+        return <div>Algorithm view</div>;
       default:
         return <div>Default view probably upload as well</div>;
     }
   };
   return (
     <>
-        <Toolbar />
-
-      <h1 className="text-blue-500 text-center">Testing</h1>
+      <Toolbar />
+      <ViewToolbar setActiveView={setActiveComponent} />
 
       {/* Plans for this section
         Toolbar for testing features
@@ -41,8 +43,6 @@ function App() {
         render the current layout in use
         be able to switch between them
         */}
-
-      <InputComponent />
 
       {renderComponent()}
     </>

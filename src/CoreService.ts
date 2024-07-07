@@ -1,5 +1,5 @@
 import ILPAllocator from "./algorithms/ILP";
-import { Setup, State } from "./interfaces";
+import { Setup, State, Pairing } from "./interfaces";
 import StateSaver from "./StateIO";
 
 class CoreService {
@@ -22,14 +22,14 @@ class CoreService {
 
   saveState(filePath: string): void {
     const currentState: State = {
-        fit_values: this.fit_values,
-        preference_values: this.preference_values,
-        fit_scalar: this.fit_scalar,
-        preference_scalar: this.preference_scalar,
-        num_teams_to_project: this.num_teams_to_project,
-        allocations: this.allocations,
-        rejections: this.rejections
-    }
+      fit_values: this.fit_values,
+      preference_values: this.preference_values,
+      fit_scalar: this.fit_scalar,
+      preference_scalar: this.preference_scalar,
+      num_teams_to_project: this.num_teams_to_project,
+      allocations: this.allocations,
+      rejections: this.rejections,
+    };
     StateSaver.save(filePath, currentState);
   }
 
@@ -66,7 +66,7 @@ class CoreService {
           this.preference_scalar * this.preference_values[i][j];
       }
     }
-    console.log('calculations go brrr');
+    console.log("calculations go brrr");
   }
 
   initialise_values(props: Setup): void {
@@ -109,6 +109,25 @@ class CoreService {
       console.log(alloc_set);
     }
     return allocation_set;
+  }
+
+  get_pairing_data(team: number, project: number): Pairing {
+    if (team < 1 || team > this.num_teams || project < 1 || project > this.num_projects) {
+        return {
+            fit_value: 0,
+            pref_value: 0,
+            fit_scalar: 0,
+            pref_scalar: 0,
+            b_value: 0
+        }
+    }
+    return {
+      fit_value: this.fit_values[team - 1][project - 1],
+      pref_value: this.preference_values[team - 1][project - 1],
+      fit_scalar: this.fit_scalar,
+      pref_scalar: this.preference_scalar,
+      b_value: this.b_values[team - 1][project - 1],
+    };
   }
 }
 

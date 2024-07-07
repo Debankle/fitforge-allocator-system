@@ -13,3 +13,11 @@ export interface State {
     allocations: number[][];
     rejections: number[][];
 }
+
+export interface Pairing {
+    fit_value: number;
+    pref_value: number;
+    fit_scalar: number;
+    pref_scalar: number;
+    b_value: number;
+}
