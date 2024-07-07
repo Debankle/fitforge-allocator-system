@@ -46,6 +46,7 @@ class CoreService {
           this.preference_scalar * this.preference_values[i][j];
       }
     }
+    console.log('calculations go brrr');
   }
 
   initialise_values(props: Setup): void {
