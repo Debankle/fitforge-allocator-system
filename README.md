@@ -1,6 +1,11 @@
 # FitForge Allocation System
 
+## TODO:
 
+### Oliver:
+- Implement allocation and rejection logic in CoreService
+- Get Pairing div to reload with b value recalculation
+- Implement save file functionality
 
 ## Testing Data
 

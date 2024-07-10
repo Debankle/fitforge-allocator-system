@@ -7,15 +7,15 @@ function Toolbar() {
   const coreService = useCoreService();
 
   const handleFitScaleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFitScale(parseFloat(e.target.value));
     const value = Math.max(0, parseFloat(e.target.value) || 0);
-    setFitScale(value);
-    coreService.set_fit_scalar(fitScale);
+    coreService.set_fit_scalar(value);
   };
 
   const handlePrefScaleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPrefScale(parseFloat(e.target.value));
     const value = Math.max(0, parseFloat(e.target.value) || 0);
-    setPrefScale(value);
-    coreService.set_pref_scalar(prefScale);
+    coreService.set_pref_scalar(value);
   };
 
   const handleLoadBtn = () => {
@@ -26,6 +26,18 @@ function Toolbar() {
   const handleSaveBtn = () => {
     // call coreservice save when implemented
     console.log("Saving not implemented yet!");
+  };
+
+  const outputLog = () => {
+    coreService.log_dump();
+  };
+
+  const softClear = () => {
+    coreService.soft_reset();
+  };
+
+  const hardClear = () => {
+    coreService.hard_reset();
   };
 
   return (
@@ -68,6 +80,27 @@ function Toolbar() {
           step="0.001"
           className="px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
         ></input>
+
+        <button
+          className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
+          onClick={outputLog}
+        >
+          Dump CoreService
+        </button>
+
+        <button
+          className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
+          onClick={softClear}
+        >
+          Reset Data
+        </button>
+
+        <button
+          className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
+          onClick={hardClear}
+        >
+          Clear All
+        </button>
       </div>
     </div>
   );
