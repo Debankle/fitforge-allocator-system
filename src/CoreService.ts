@@ -3,12 +3,6 @@ import { Setup, State, Pairing } from "./interfaces";
 import StateSaver from "./StateIO";
 
 class CoreService {
-  /*
-      CoreService class - initialised at the loading of the app
-      Handles the background storage and organisation of the data for m teams and n projects
-  
-      TODO: add comments about properties and functions
-      */
   private fit_values: number[][] = [[]];
   private preference_values: number[][] = [[]];
   private fit_scalar: number = 1;
@@ -19,6 +13,8 @@ class CoreService {
   private rejections: number[][] = [[]];
   private num_teams: number = 0;
   private num_projects: number = 0;
+  private min: number = 0;
+  private max: number = 0;
 
   saveState(filePath: string): void {
     const currentState: State = {
@@ -61,9 +57,12 @@ class CoreService {
     for (let i = 0; i < this.num_teams; i++) {
       this.b_values[i] = [];
       for (let j = 0; j < this.num_projects; j++) {
-        this.b_values[i][j] =
+        let a =
           this.fit_scalar * this.fit_values[i][j] +
           this.preference_scalar * this.preference_values[i][j];
+        if (a > this.max) this.max = a;
+        if (a < this.min) this.min = a;
+        this.b_values[i][j] = a;
       }
     }
     console.log("calculations go brrr");
@@ -112,14 +111,19 @@ class CoreService {
   }
 
   get_pairing_data(team: number, project: number): Pairing {
-    if (team < 1 || team > this.num_teams || project < 1 || project > this.num_projects) {
-        return {
-            fit_value: 0,
-            pref_value: 0,
-            fit_scalar: 0,
-            pref_scalar: 0,
-            b_value: 0
-        }
+    if (
+      team < 1 ||
+      team > this.num_teams ||
+      project < 1 ||
+      project > this.num_projects
+    ) {
+      return {
+        fit_value: 0,
+        pref_value: 0,
+        fit_scalar: 0,
+        pref_scalar: 0,
+        b_value: 0,
+      };
     }
     return {
       fit_value: this.fit_values[team - 1][project - 1],
@@ -128,6 +132,26 @@ class CoreService {
       pref_scalar: this.preference_scalar,
       b_value: this.b_values[team - 1][project - 1],
     };
+  }
+
+  get_bg_color(bvalue: number): string {
+    let val = Math.round(((bvalue - this.min) / (this.max - this.min)) * 255);
+    let rbga = (1 - val).toString() + "," + val.toString() + ",0,";
+    return rbga;
+  }
+
+  log_dump() {
+    console.log(this.b_values);
+    console.log(this.allocations);
+    console.log(this.rejections);
+  }
+
+  is_pairing_allocated(team: number, project: number): boolean {
+    return false;
+  }
+
+  is_pairing_rejected(team: number, project: number): boolean {
+    return false;
   }
 }
 
