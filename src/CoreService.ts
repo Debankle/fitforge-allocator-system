@@ -1,3 +1,4 @@
+import { useState } from "react";
 import ILPAllocator from "./algorithms/ILP";
 import { Setup, State, Pairing } from "./interfaces";
 import StateSaver from "./StateIO";
@@ -54,17 +55,19 @@ class CoreService {
   }
 
   calculate_b_values(): void {
+    const newBValues: number[][] = [];
     for (let i = 0; i < this.num_teams; i++) {
-      this.b_values[i] = [];
+      newBValues[i] = [];
       for (let j = 0; j < this.num_projects; j++) {
         let a =
           this.fit_scalar * this.fit_values[i][j] +
           this.preference_scalar * this.preference_values[i][j];
         if (a > this.max) this.max = a;
         if (a < this.min) this.min = a;
-        this.b_values[i][j] = a;
+        newBValues[i][j] = a;
       }
     }
+    this.b_values = newBValues;
     console.log("calculations go brrr");
   }
 
@@ -141,6 +144,7 @@ class CoreService {
   }
 
   log_dump() {
+    console.log(this.fit_values);
     console.log(this.b_values);
     console.log(this.allocations);
     console.log(this.rejections);
