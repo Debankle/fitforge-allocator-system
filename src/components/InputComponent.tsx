@@ -1,26 +1,13 @@
-<<<<<<< HEAD
 import React, { ChangeEvent, useState, useEffect } from "react";
 import readXlsxFile from "read-excel-file";
 import * as XLSX from "xlsx";
 import { useCoreService } from "../CoreServiceContext";
 
-=======
-import React, { ChangeEvent, useState } from "react";
-import readXlsxFile from "read-excel-file";
-import * as XLSX from "xlsx"; 
-import { useCoreService } from "../CoreServiceContext";
-
-
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
 interface Setup {
   fit_vals: number[][];
   pref_vals: number[][];
   num_teams_to_project: number[];
-<<<<<<< HEAD
   sheet_tags?: { [key: string]: string };
-=======
-  sheet_tags?: { [key: string]: string }; 
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
 }
 
 interface SheetTags {
@@ -31,11 +18,8 @@ function InputComponent() {
   const [files, setFiles] = useState<File[]>([]);
   const [sheetNames, setSheetNames] = useState<string[]>([]);
   const [sheetTags, setSheetTags] = useState<SheetTags>({});
-<<<<<<< HEAD
   const [processing, setProcessing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-=======
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
   const coreService = useCoreService();
 
   useEffect(() => {
@@ -47,14 +31,9 @@ function InputComponent() {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
       setFiles(selectedFiles);
-<<<<<<< HEAD
       setSheetNames([]);
       setSheetTags({});
       setLoadError(null);
-=======
-      setSheetNames([]); 
-      setSheetTags({}); 
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
     }
   };
 
@@ -70,11 +49,7 @@ function InputComponent() {
           setSheetNames(sheetNamesArray);
           const initialTags: SheetTags = {};
           sheetNamesArray.forEach((name) => {
-<<<<<<< HEAD
             initialTags[name] = "";
-=======
-            initialTags[name] = ""; 
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
           });
           setSheetTags(initialTags);
         }
@@ -89,19 +64,13 @@ function InputComponent() {
 
   const loadData = () => {
     if (files.length !== 0) {
-<<<<<<< HEAD
       setProcessing(true);
       const sheet = files[0];
       const promises: Promise<{ data: number[][]; tag: string }>[] = [];
-=======
-      const sheet = files[0];
-      const promises: Promise<{ data: number[][], tag: string }>[] = [];
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
       const fit: number[][] = [];
       const pref: number[][] = [];
       const n: number[] = [];
 
-<<<<<<< HEAD
       sheetNames.forEach((sheetName, index) => {
         if (sheetTags[sheetName] === "Fit" || sheetTags[sheetName] === "Pref") {
           // Adjust the index for 1-based indexing
@@ -138,35 +107,6 @@ function InputComponent() {
         .finally(() => {
           setProcessing(false);
         });
-=======
-      // Read all sheets
-      sheetNames.forEach((sheetName, index) => {
-        if (sheetTags[sheetName] === "Fit" || sheetTags[sheetName] === "Pref") {
-          promises.push(readFromExcelSheet(sheet, index, sheetTags[sheetName]));
-        }
-      });
-
-      Promise.all(promises).then((results) => {
-        results.forEach(({ data, tag }) => {
-          if (tag === "Fit") {
-            fit.push(...data);
-            n.push(data.length);
-          } else if (tag === "Pref") {
-            pref.push(...data);
-          }
-        });
-
-        const setupParams: Setup = {
-          fit_vals: fit,
-          pref_vals: pref,
-          num_teams_to_project: n,
-          sheet_tags: sheetTags,
-        };
-
-        coreService.initialise_values(setupParams);
-        coreService.run_algorithm("ILP");
-      });
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
     }
   };
 
@@ -174,11 +114,7 @@ function InputComponent() {
     sheet: File,
     sheetIndex: number,
     tag: string
-<<<<<<< HEAD
   ): Promise<{ data: number[][]; tag: string }> => {
-=======
-  ): Promise<{ data: number[][], tag: string }> => {
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
     return new Promise((resolve, reject) => {
       readXlsxFile(sheet, { sheet: sheetIndex })
         .then((data) => {
@@ -189,11 +125,8 @@ function InputComponent() {
               const cellValue = data[i][j];
               if (typeof cellValue === "number") {
                 dataArray[i - 1][j] = cellValue;
-<<<<<<< HEAD
               } else {
                 dataArray[i - 1][j] = Number(cellValue) || 0; // Ensure cell values are numbers
-=======
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
               }
             }
           }
@@ -214,10 +147,7 @@ function InputComponent() {
         multiple
         onChange={handleFileChange}
         className="m-2"
-<<<<<<< HEAD
         disabled={processing}
-=======
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
       />
 
       {sheetNames.length > 0 && (
@@ -248,44 +178,12 @@ function InputComponent() {
         </div>
       )}
 
-<<<<<<< HEAD
       <button
         className="bg-blue-200 m-5 px-4 py-2 rounded-md"
         onClick={loadSheetNames}
         disabled={processing || files.length === 0}
       >
         {processing ? "Loading..." : "Load Sheets"}
-=======
-      {sheetNames.length > 0 && (
-        <div>
-          <h3>Sheet Names:</h3>
-          <ul>
-            {sheetNames.map((name, index) => (
-              <li key={index}>
-                {name}
-                <div>
-                  <select
-                    value={sheetTags[name]}
-                    onChange={(e) => handleTagChange(name, e.target.value)}
-                  >
-                    <option value="">Select Tag</option>
-                    <option value="Fit">Fit</option>
-                    <option value="Pref">Pref</option>
-                  </select>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <button className="bg-blue-200 m-5" onClick={loadSheetNames}>
-        Load Sheets
-      </button>
-
-      <button className="bg-blue-200 m-5" onClick={loadData}>
-        Process Data
->>>>>>> aa9d4dd4f209ad2e5bbd4c366e5642adcc87d310
       </button>
 
       <button
@@ -302,3 +200,4 @@ function InputComponent() {
 }
 
 export default InputComponent;
+
