@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useCoreService } from "../../CoreServiceContext";
 import { Pairing } from "../../interfaces";
 import PairingDiv from "../Pairing";
