@@ -1,4 +1,16 @@
 {
+  "compilerOptions": {
+    "target": "es2015",
+    "allowImportingTsExtensions": true,
+    "noEmit": true, // or "emitDeclarationOnly": true
+    "module": "esnext",
+    "lib": ["es2015", "dom"],
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
+  },
   "files": [],
   "references": [
     {

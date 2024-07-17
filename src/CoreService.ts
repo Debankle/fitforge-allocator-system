@@ -16,6 +16,13 @@ class CoreService {
   private min: number = 0;
   private max: number = 0;
 
+  getNumTeams(): number {
+    return this.num_teams;
+  }
+
+  getNumProjects(): number {
+    return this.num_projects;
+  }
   saveState(filePath: string): void {
     const currentState: State = {
       fit_values: this.fit_values,
@@ -123,6 +130,8 @@ class CoreService {
         fit_scalar: 0,
         pref_scalar: 0,
         b_value: 0,
+        team: team,
+        project: project
       };
     }
     return {
@@ -131,6 +140,8 @@ class CoreService {
       fit_scalar: this.fit_scalar,
       pref_scalar: this.preference_scalar,
       b_value: this.b_values[team - 1][project - 1],
+      team: team,
+      project: project
     };
   }
 

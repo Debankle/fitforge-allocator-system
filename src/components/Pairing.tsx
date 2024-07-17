@@ -1,6 +1,6 @@
 import { useCoreService } from "../CoreServiceContext";
 import { Pairing } from "../interfaces";
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface Props {
   team: number;
