@@ -12,6 +12,7 @@ export interface State {
     num_teams_to_project: number[];
     allocations: number[][];
     rejections: number[][];
+    allocation_sets: number[][][];
 }
 
 export interface Pairing {

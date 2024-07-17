@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useCoreService } from "../../CoreServiceContext";
 import { Pairing } from "../../interfaces";
+import PairingDiv from "../Pairing";
 
 function ListView() {
   const coreService = useCoreService();
@@ -18,8 +19,8 @@ function ListView() {
     const maxProjects = coreService.getNumProjects();
 
     // Loop through all possible pairings
-    for (let team = 1; team <= maxTeams; team++) {
-      for (let project = 1; project <= maxProjects; project++) {
+    for (let team = 1; team < maxTeams; team++) {
+      for (let project = 1; project < maxProjects; project++) {
         // Check if the pairing is allocated or rejected
         const pairingData = coreService.get_pairing_data(team, project);
         loadedPairings.push(pairingData);
@@ -50,15 +51,16 @@ function ListView() {
         </thead>
         <tbody>
           {pairings.map((pairing, index) => (
-            <tr key={index}>
-              <td className="border px-4 py-2">{pairing.team}</td>
-              <td className="border px-4 py-2">{pairing.project}</td>
-              <td className="border px-4 py-2">{pairing.fit_value}</td>
-              <td className="border px-4 py-2">{pairing.pref_value}</td>
-              <td className="border px-4 py-2">{pairing.b_value}</td>
-              <td className="border px-4 py-2">{pairing.fit_scalar}</td>
-              <td className="border px-4 py-2">{pairing.pref_scalar}</td>
-            </tr>
+            <PairingDiv team={pairing.team} project={pairing.project} />
+            // <tr key={index}>
+            //   <td className="border px-4 py-2">{pairing.team}</td>
+            //   <td className="border px-4 py-2">{pairing.project}</td>
+            //   <td className="border px-4 py-2">{pairing.fit_value}</td>
+            //   <td className="border px-4 py-2">{pairing.pref_value}</td>
+            //   <td className="border px-4 py-2">{pairing.b_value}</td>
+            //   <td className="border px-4 py-2">{pairing.fit_scalar}</td>
+            //   <td className="border px-4 py-2">{pairing.pref_scalar}</td>
+            // </tr>
           ))}
         </tbody>
       </table>
