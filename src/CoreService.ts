@@ -11,10 +11,11 @@ class CoreService {
   private num_teams_to_project: number[] = [];
   private allocations: number[][] = [[]];
   private rejections: number[][] = [[]];
+  private allocation_sets: number[][][] = [[[]]];
   private num_teams: number = 0;
   private num_projects: number = 0;
-  private min: number = 0;
-  private max: number = 0;
+  private min: number = Infinity;
+  private max: number = -Infinity;
 
   getNumTeams(): number {
     return this.num_teams;
@@ -23,7 +24,8 @@ class CoreService {
   getNumProjects(): number {
     return this.num_projects;
   }
-  saveState(filePath: string): void {
+
+  saveState(): void {
     const currentState: State = {
       fit_values: this.fit_values,
       preference_values: this.preference_values,
@@ -32,8 +34,9 @@ class CoreService {
       num_teams_to_project: this.num_teams_to_project,
       allocations: this.allocations,
       rejections: this.rejections,
+      allocation_sets: this.allocation_sets,
     };
-    StateSaver.save(filePath, currentState);
+    StateSaver.save("", currentState);
   }
 
   loadState(filePath: string): void {
@@ -131,7 +134,7 @@ class CoreService {
         pref_scalar: 0,
         b_value: 0,
         team: team,
-        project: project
+        project: project,
       };
     }
     return {
@@ -141,13 +144,13 @@ class CoreService {
       pref_scalar: this.preference_scalar,
       b_value: this.b_values[team - 1][project - 1],
       team: team,
-      project: project
+      project: project,
     };
   }
 
   get_bg_color(bvalue: number): string {
     let val = Math.round(((bvalue - this.min) / (this.max - this.min)) * 255);
-    let rbga = (1 - val).toString() + "," + val.toString() + ",0,";
+    let rbga = (255 - val).toString() + "," + val.toString() + ",0,";
     return rbga;
   }
 
