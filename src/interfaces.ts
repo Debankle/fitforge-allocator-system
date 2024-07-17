@@ -20,4 +20,6 @@ export interface Pairing {
     fit_scalar: number;
     pref_scalar: number;
     b_value: number;
+    team: number;
+    project: number;
 }
