@@ -51,7 +51,7 @@ function ListView() {
         </thead>
         <tbody>
           {pairings.map((pairing, index) => (
-            <PairingDiv team={pairing.team} project={pairing.project} />
+            <PairingDiv key={index} team={pairing.team} project={pairing.project} />
             // <tr key={index}>
             //   <td className="border px-4 py-2">{pairing.team}</td>
             //   <td className="border px-4 py-2">{pairing.project}</td>

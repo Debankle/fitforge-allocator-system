@@ -1,6 +1,5 @@
 import { ChangeEvent, useState, useEffect } from "react";
-import readXlsxFile from "read-excel-file";
-import * as XLSX from "xlsx";
+import readXlsxFile, { readSheetNames } from "read-excel-file";
 import { useCoreService } from "../CoreServiceContext";
 
 interface Setup {
@@ -41,11 +40,10 @@ function InputComponent() {
     if (files.length !== 0) {
       const sheet = files[0];
       const reader = new FileReader();
-      reader.onload = (event: ProgressEvent<FileReader>) => {
+      reader.onload = async (event: ProgressEvent<FileReader>) => {
         if (event.target) {
-          const data = event.target.result;
-          const wb = XLSX.read(data, { type: "binary" });
-          const sheetNamesArray: string[] = wb.SheetNames;
+          const data = event.target.result as ArrayBuffer;
+          const sheetNamesArray: string[] = await readSheetNames(data);
           setSheetNames(sheetNamesArray);
           const initialTags: SheetTags = {};
           sheetNamesArray.forEach((name) => {
@@ -54,7 +52,7 @@ function InputComponent() {
           setSheetTags(initialTags);
         }
       };
-      reader.readAsBinaryString(sheet);
+      reader.readAsText(sheet);
     }
   };
 
@@ -74,7 +72,9 @@ function InputComponent() {
       sheetNames.forEach((sheetName, index) => {
         if (sheetTags[sheetName] === "Fit" || sheetTags[sheetName] === "Pref") {
           // Adjust the index for 1-based indexing
-          promises.push(readFromExcelSheet(sheet, index + 1, sheetTags[sheetName]));
+          promises.push(
+            readFromExcelSheet(sheet, index + 1, sheetTags[sheetName])
+          );
         }
       });
 
@@ -158,7 +158,10 @@ function InputComponent() {
           </h3>
           <ul>
             {sheetNames.map((name, index) => (
-              <li key={index} style={{ marginBottom: "10px", fontSize: "18px" }}>
+              <li
+                key={index}
+                style={{ marginBottom: "10px", fontSize: "18px" }}
+              >
                 {name}
                 <div>
                   <select
@@ -200,4 +203,3 @@ function InputComponent() {
 }
 
 export default InputComponent;
-

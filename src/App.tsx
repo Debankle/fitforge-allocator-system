@@ -23,7 +23,8 @@ function App() {
       case "Algorithm":
         return <div>Algorithm view</div>;
       case "Spreadsheet":
-        return <SpreadsheetView />;
+        return <></>;
+        // return <SpreadsheetView />;
       case "Allocations":
         return <ListView />;
       case "Pairing":

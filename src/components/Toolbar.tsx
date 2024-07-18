@@ -1,9 +1,10 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { useCoreService } from "../CoreServiceContext";
 
 function Toolbar() {
   const [fitScale, setFitScale] = useState<number>(1);
   const [prefScale, setPrefScale] = useState<number>(1);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const coreService = useCoreService();
 
   const handleFitScaleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,29 +20,32 @@ function Toolbar() {
   };
 
   const handleLoadBtn = () => {
-    // call coreservice load when implemented
-    console.log("Loading not implemented yet!");
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        coreService.loadState(file);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   const handleSaveBtn = () => {
-    // call coreservice save when implemented
-    console.log("Saving not implemented yet!");
-  };
-
-  const outputLog = () => {
-    coreService.log_dump();
-  };
-
-  const softClear = () => {
-    coreService.soft_reset();
-  };
-
-  const hardClear = () => {
-    coreService.hard_reset();
+    coreService.saveState("saveState.ffas");
   };
 
   return (
     <div className="bg-green-300 p-4 flex justify-between items-center">
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
       <div className="flex space-x-4">
         <button
           className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
@@ -83,21 +87,27 @@ function Toolbar() {
 
         <button
           className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-          onClick={outputLog}
+          onClick={() => {
+            coreService.log_dump();
+          }}
         >
           Dump CoreService
         </button>
 
         <button
           className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-          onClick={softClear}
+          onClick={() => {
+            coreService.soft_reset();
+          }}
         >
           Reset Data
         </button>
 
         <button
           className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-          onClick={hardClear}
+          onClick={() => {
+            coreService.hard_reset();
+          }}
         >
           Clear All
         </button>

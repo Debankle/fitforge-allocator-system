@@ -25,7 +25,7 @@ class CoreService {
     return this.num_projects;
   }
 
-  saveState(): void {
+  saveState(filename: string): void {
     const currentState: State = {
       fit_values: this.fit_values,
       preference_values: this.preference_values,
@@ -36,13 +36,22 @@ class CoreService {
       rejections: this.rejections,
       allocation_sets: this.allocation_sets,
     };
-    StateSaver.save("", currentState);
+    StateSaver.save(filename, currentState);
   }
 
-  loadState(filePath: string): void {
-    const newState: State = StateSaver.load(filePath);
-    console.log(newState);
-    // Hard Reset and then load in the data
+  async loadState(file: File): Promise<void> {
+    const newState = await StateSaver.load(file);
+    this.fit_values = newState.fit_values;
+    this.preference_values = newState.preference_values;
+    this.num_teams_to_project = newState.num_teams_to_project;
+    this.fit_scalar = newState.fit_scalar;
+    this.preference_scalar = newState.preference_scalar;
+    this.allocations = newState.allocations;
+    this.rejections = newState.rejections;
+    this.allocation_sets = newState.allocation_sets;
+    this.num_teams = this.fit_values.length;
+    this.num_projects = this.fit_values[0].length;
+    this.calculate_b_values();
   }
 
   hard_reset(): void {
@@ -75,7 +84,6 @@ class CoreService {
         this.b_values[i][j] = a;
       }
     }
-    console.log("calculations go brrr");
   }
 
   initialise_values(props: Setup): void {
@@ -85,7 +93,6 @@ class CoreService {
     this.num_teams = this.fit_values.length;
     this.num_projects = this.fit_values[0].length;
     this.soft_reset();
-    console.log(this.b_values);
   }
 
   set_fit_scalar(fit_scale: number): void {

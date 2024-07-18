@@ -23,12 +23,24 @@ function PairingDiv(props: Props) {
   );
   const bgColor: string = coreService.get_bg_color(pairingData.b_value);
 
-  const allocatedCheckmarkChange = () => {};
+  const allocatedCheckmarkChange = () => {
+    if (isRejected) {
+      // throw error
+    } else if (isAllocated) {
+      // remove allocation
+    } else {
+      // add allocation
+    }
+  };
 
-  const rejectedCheckmarkChange = () => {};
-
-  const expandView = () => {
-    changeExpandedViewState(!expandedViewState);
+  const rejectedCheckmarkChange = () => {
+    if (isAllocated) {
+      // throw error
+    } else if (isRejected) {
+      // remove rejection
+    } else {
+      // add rejection
+    }
   };
 
   const toggleHover = () => {
@@ -57,7 +69,12 @@ function PairingDiv(props: Props) {
       onMouseEnter={toggleHover}
       onMouseLeave={toggleHover}
     >
-      <div className="flex" onClick={expandView}>
+      <div
+        className="flex"
+        onClick={() => {
+          changeExpandedViewState(!expandedViewState);
+        }}
+      >
         <div className="flex-1 flex flex-col justify-center">
           <div className="text-xl font-bold">Team:</div>
           <div className="text-2xl">{props.team}</div>
