@@ -9,9 +9,9 @@ class CoreService {
   private preference_scalar: number = 1;
   private b_values: number[][] = [[]];
   private num_teams_to_project: number[] = [];
-  private allocations: number[][] = [[]];
-  private rejections: number[][] = [[]];
-  private allocation_sets: number[][][] = [[[]]];
+  private allocations: number[][] = [];
+  private rejections: number[][] = [];
+  private allocation_sets: number[][][] = [];
   private num_teams: number = 0;
   private num_projects: number = 0;
   private min: number = Infinity;
@@ -123,7 +123,19 @@ class CoreService {
         this.num_teams_to_project
       );
       console.log(alloc_set);
+      if (alloc_set["feasible"] == true) {
+        for (const key in alloc_set) {
+          if (key != "feasible" && key != "result" && key != "bounded") {
+            const set = key as string;
+            allocation_set.push([parseInt(set[2]), parseInt(set[4])]);
+          }
+        }
+      } else {
+        console.error("Failed to find a valid allocation");
+      }
+    } else if (algorithm == "GS") {
     }
+    this.allocation_sets.push(allocation_set);
     return allocation_set;
   }
 
@@ -165,6 +177,7 @@ class CoreService {
     console.log(this.b_values);
     console.log(this.allocations);
     console.log(this.rejections);
+    console.log(this.allocation_sets);
   }
 
   is_pairing_allocated(team: number, project: number): boolean {
