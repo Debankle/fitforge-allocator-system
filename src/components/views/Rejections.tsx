@@ -17,10 +17,10 @@ function Rejections() {
         <option value="Descending">Descending</option>
       </select>
 
-      {rejection[0].length == 0 ? (
+      {rejection.length == 0 ? (
         "No rejected pairings"
       ) : (
-        <ListView pairings={rejection} />
+        <ListView title={"Rejected Pairings"} pairings={rejection} />
       )}
     </div>
   );

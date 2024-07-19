@@ -19,7 +19,12 @@ function Allocations() {
         <option value="Descending">Descending</option>
       </select>
 
-      <ListView pairings={coreSerivce.get_allocations()} />
+      <label>Score: {coreSerivce.get_score()}</label>
+
+      <ListView
+        title={"Allocated Pairings"}
+        pairings={coreSerivce.get_allocations()}
+      />
     </div>
   );
 }

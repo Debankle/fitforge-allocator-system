@@ -1,6 +1,7 @@
 import ILPAllocator from "./algorithms/ILP";
 import { Setup, State, Pairing } from "./interfaces";
 import StateSaver from "./StateIO";
+import { AllocationSet } from "./interfaces";
 
 class CoreService {
   private fit_values: number[][] = [[]];
@@ -9,9 +10,9 @@ class CoreService {
   private preference_scalar: number = 1;
   private b_values: number[][] = [[]];
   private num_teams_to_project: number[] = [];
-  private allocations: number[][] = [[]];
-  private rejections: number[][] = [[]];
-  private allocation_sets: number[][][] = [[[]]];
+  private allocations: number[][] = [];
+  private rejections: number[][] = [];
+  private allocation_sets: AllocationSet[] = [];
   private num_teams: number = 0;
   private num_projects: number = 0;
   private min: number = Infinity;
@@ -54,8 +55,8 @@ class CoreService {
     this.num_teams_to_project = [];
     this.num_teams = 0;
     this.num_projects = 0;
-    this.allocations = [[]];
-    this.rejections = [[]];
+    this.allocations = [];
+    this.rejections = [];
     this.soft_reset();
     this.isDataLoaded = false;
   }
@@ -63,7 +64,7 @@ class CoreService {
   soft_reset(): void {
     this.fit_scalar = 1;
     this.preference_scalar = 1;
-    this.allocation_sets = [[[]]];
+    this.allocation_sets = [];
     this.calculate_b_values();
   }
 
@@ -173,8 +174,7 @@ class CoreService {
     return this.rejections;
   }
 
-  run_algorithm(algorithm: string): number[][] {
-    let allocation_set: number[][] = [];
+  run_algorithm(algorithm: string): boolean {
     if (algorithm == "ILP") {
       const alloc_set = ILPAllocator(
         this.b_values,
@@ -182,21 +182,28 @@ class CoreService {
         this.rejections,
         this.num_teams_to_project
       );
-      console.log(alloc_set);
+      let allocations = [];
       if (alloc_set["feasible"] == true) {
         for (const key in alloc_set) {
           if (key != "feasible" && key != "result" && key != "bounded") {
             const set = key as string;
-            allocation_set.push([parseInt(set[2]), parseInt(set[4])]);
+            allocations.push([parseInt(set[2]), parseInt(set[4])]);
           }
         }
+        const allocation: AllocationSet = {
+          allocation: allocations,
+          score: alloc_set["result"] as number,
+          algorithm: "ILP",
+          runCount: this.allocation_sets.length + 1,
+        };
+        this.allocation_sets.push(allocation);
+        return true;
       } else {
         console.error("Failed to find a valid allocation");
       }
     } else if (algorithm == "GS") {
     }
-    this.allocation_sets.push(allocation_set);
-    return allocation_set;
+    return false;
   }
 
   get_pairing_data(team: number, project: number): Pairing {
@@ -239,7 +246,7 @@ class CoreService {
 
   get_bg_color(bvalue: number): string {
     if (bvalue == -1) {
-        return '0,0,180,';
+      return "0,0,180,";
     }
     let val = Math.round(((bvalue - this.min) / (this.max - this.min)) * 255);
     let rbga = (255 - val).toString() + "," + val.toString() + ",0,";
@@ -268,6 +275,22 @@ class CoreService {
     } else {
       return false;
     }
+  }
+
+  get_allocation_sets(): AllocationSet[] {
+    return this.allocation_sets;
+  }
+
+  get_score(): number {
+    let score = 0;
+    for (const allocation of this.allocations) {
+      const team: number = allocation[0];
+      const project: number = allocation[1];
+      if (project != 0) {
+        score = score + this.b_values[team - 1][project - 1];
+      }
+    }
+    return score;
   }
 }
 

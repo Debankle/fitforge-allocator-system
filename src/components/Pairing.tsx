@@ -50,7 +50,7 @@ function PairingDiv(props: Props) {
       setIsRejected(false);
     } else {
       coreService.set_rejection(props.team, props.project);
-      setIsRejected(false);
+      setIsRejected(true);
     }
   };
 
