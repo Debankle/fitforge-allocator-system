@@ -1,4 +1,3 @@
-import { useState } from "react";
 import ILPAllocator from "./algorithms/ILP";
 import { Setup, State, Pairing } from "./interfaces";
 import StateSaver from "./StateIO";
@@ -12,12 +11,21 @@ class CoreService {
   private num_teams_to_project: number[] = [];
   private allocations: number[][] = [[]];
   private rejections: number[][] = [[]];
+  private allocation_sets: number[][][] = [[[]]];
   private num_teams: number = 0;
   private num_projects: number = 0;
-  private min: number = 0;
-  private max: number = 0;
+  private min: number = Infinity;
+  private max: number = -Infinity;
 
-  saveState(filePath: string): void {
+  getNumTeams(): number {
+    return this.num_teams;
+  }
+
+  getNumProjects(): number {
+    return this.num_projects;
+  }
+
+  saveState(): void {
     const currentState: State = {
       fit_values: this.fit_values,
       preference_values: this.preference_values,
@@ -26,8 +34,9 @@ class CoreService {
       num_teams_to_project: this.num_teams_to_project,
       allocations: this.allocations,
       rejections: this.rejections,
+      allocation_sets: this.allocation_sets,
     };
-    StateSaver.save(filePath, currentState);
+    StateSaver.save("", currentState);
   }
 
   loadState(filePath: string): void {
@@ -55,19 +64,17 @@ class CoreService {
   }
 
   calculate_b_values(): void {
-    const newBValues: number[][] = [];
     for (let i = 0; i < this.num_teams; i++) {
-      newBValues[i] = [];
+      this.b_values[i] = [];
       for (let j = 0; j < this.num_projects; j++) {
         let a =
           this.fit_scalar * this.fit_values[i][j] +
           this.preference_scalar * this.preference_values[i][j];
         if (a > this.max) this.max = a;
         if (a < this.min) this.min = a;
-        newBValues[i][j] = a;
+        this.b_values[i][j] = a;
       }
     }
-    this.b_values = newBValues;
     console.log("calculations go brrr");
   }
 
@@ -126,6 +133,8 @@ class CoreService {
         fit_scalar: 0,
         pref_scalar: 0,
         b_value: 0,
+        team: team,
+        project: project,
       };
     }
     return {
@@ -134,17 +143,18 @@ class CoreService {
       fit_scalar: this.fit_scalar,
       pref_scalar: this.preference_scalar,
       b_value: this.b_values[team - 1][project - 1],
+      team: team,
+      project: project,
     };
   }
 
   get_bg_color(bvalue: number): string {
     let val = Math.round(((bvalue - this.min) / (this.max - this.min)) * 255);
-    let rbga = (1 - val).toString() + "," + val.toString() + ",0,";
+    let rbga = (255 - val).toString() + "," + val.toString() + ",0,";
     return rbga;
   }
 
   log_dump() {
-    console.log(this.fit_values);
     console.log(this.b_values);
     console.log(this.allocations);
     console.log(this.rejections);

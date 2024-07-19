@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import CoreService from "./CoreService";
 
 const CoreServiceContext = createContext<CoreService | null>(null);

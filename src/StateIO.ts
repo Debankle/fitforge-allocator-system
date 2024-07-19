@@ -24,6 +24,7 @@ class StateSaver {
       num_teams_to_project: [],
       allocations: [[]],
       rejections: [[]],
+      allocation_sets: [[[]]]
     };
   }
 

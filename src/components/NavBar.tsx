@@ -18,10 +18,16 @@ const NavBar: React.FC<NavBarProps> = ({ setActiveView }) => {
         >
           Algorithm
         </li>
-        <li className="text-white cursor-pointer hover:text-gray-400">
+        <li
+          className="text-white cursor-pointer hover:text-gray-400"
+          onClick={() => setActiveView("Spreadsheet")}
+        >
           Spreadsheet
         </li>
-        <li className="text-white cursor-pointer hover:text-gray-400">
+        <li
+          className="text-white cursor-pointer hover:text-gray-400"
+          onClick={() => setActiveView("Allocations")}
+        >
           Allocations
         </li>
         <li className="text-white cursor-pointer hover:text-gray-400">
