@@ -74,14 +74,16 @@ function InputComponent() {
       sheetNames.forEach((sheetName, index) => {
         if (sheetTags[sheetName] === "Fit" || sheetTags[sheetName] === "Pref") {
           // Adjust the index for 1-based indexing
-          promises.push(readFromExcelSheet(sheet, index + 1, sheetTags[sheetName]));
+          promises.push(
+            readFromExcelSheet(sheet, index + 1, sheetTags[sheetName])
+          );
         }
       });
 
       Promise.all(promises)
         .then((results) => {
           results.forEach(({ data, tag }) => {
-            console.log(`Data for ${tag} sheet:`, data); // Added for debugging
+            // console.log(`Data for ${tag} sheet:`, data); // Added for debugging
             if (tag === "Fit") {
               fit.push(...data);
             } else if (tag === "Pref") {
@@ -120,12 +122,10 @@ function InputComponent() {
           const dataArray: number[][] = [];
           for (let i = 1; i < data.length; i++) {
             dataArray[i - 1] = [];
-            for (let j = 0; j < data[0].length; j++) {
+            for (let j = 1; j < data[0].length; j++) {
               const cellValue = data[i][j];
               if (typeof cellValue === "number") {
-                dataArray[i - 1][j] = cellValue;
-              } else {
-                dataArray[i - 1][j] = Number(cellValue) || 0; // Ensure cell values are numbers
+                dataArray[i - 1][j - 1] = cellValue;
               }
             }
           }
@@ -157,7 +157,10 @@ function InputComponent() {
           </h3>
           <ul>
             {sheetNames.map((name, index) => (
-              <li key={index} style={{ marginBottom: "10px", fontSize: "18px" }}>
+              <li
+                key={index}
+                style={{ marginBottom: "10px", fontSize: "18px" }}
+              >
                 {name}
                 <div>
                   <select
@@ -199,4 +202,3 @@ function InputComponent() {
 }
 
 export default InputComponent;
-

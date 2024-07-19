@@ -93,6 +93,7 @@ class CoreService {
     this.num_teams = this.fit_values.length;
     this.num_projects = this.fit_values[0].length;
     this.soft_reset();
+    this.set_initial_allocations();
   }
 
   set_fit_scalar(fit_scale: number): void {
@@ -103,6 +104,69 @@ class CoreService {
   set_pref_scalar(pref_scale: number): void {
     this.preference_scalar = pref_scale;
     this.calculate_b_values();
+  }
+
+  set_initial_allocations(): void {
+    for (let i = 1; i <= this.num_teams; i++) {
+      this.allocations.push([i, 0]);
+    }
+  }
+
+  set_allocation(team: number, project: number): boolean {
+    if (
+      this.rejections.some((row) =>
+        row.every((value, index) => value === [team, project][index])
+      )
+    ) {
+      console.log("pairing is already rejected");
+      return false;
+    }
+    if (this.allocations[team - 1][1] == 0) {
+      if (
+        this.allocations.filter((row) => row[1] === project).length <
+        this.num_teams_to_project[project - 1]
+      ) {
+        this.allocations[team - 1][1] = project;
+        return true;
+      } else {
+        console.log("too many teams allocated to that project already");
+        return false;
+      }
+    } else {
+      console.log("team already has a project allocated");
+      return false;
+    }
+  }
+
+  remove_allocation(team: number, project: number): boolean {
+    if (this.allocations[team - 1][1] == project) {
+      this.allocations[team - 1][1] = 0;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  set_rejection(team: number, project: number): boolean {
+    if (this.allocations[team - 1][1] != project) {
+      this.rejections.push([team, project]);
+      return true;
+    } else {
+      console.log("pairing is already allocated");
+      return false;
+    }
+  }
+
+  remove_rejection(team: number, project: number): boolean {
+    const index = this.rejections.findIndex(
+      (row) => row[0] == team && row[1] == project
+    );
+    if (index !== -1) {
+      this.rejections.splice(index, 1);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   get_allocations(): number[][] {
@@ -125,6 +189,7 @@ class CoreService {
       console.log(alloc_set);
       if (alloc_set["feasible"] == true) {
         for (const key in alloc_set) {
+          console.log(key);
           if (key != "feasible" && key != "result" && key != "bounded") {
             const set = key as string;
             allocation_set.push([parseInt(set[2]), parseInt(set[4])]);
@@ -140,7 +205,17 @@ class CoreService {
   }
 
   get_pairing_data(team: number, project: number): Pairing {
-    if (
+    if (team >= 1 && project < 1) {
+      return {
+        fit_value: -1,
+        pref_value: -1,
+        fit_scalar: -1,
+        pref_scalar: -1,
+        b_value: -1,
+        team: team,
+        project: -1,
+      };
+    } else if (
       team < 1 ||
       team > this.num_teams ||
       project < 1 ||

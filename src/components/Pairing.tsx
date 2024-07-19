@@ -25,21 +25,31 @@ function PairingDiv(props: Props) {
 
   const allocatedCheckmarkChange = () => {
     if (isRejected) {
-      // throw error
+      coreService.remove_rejection(props.team, props.project);
+      coreService.set_allocation(props.team, props.project);
+      setIsRejected(false);
+      setIsAllocated(true);
     } else if (isAllocated) {
-      // remove allocation
+      coreService.remove_allocation(props.team, props.project);
+      setIsAllocated(false);
     } else {
-      // add allocation
+      coreService.set_allocation(props.team, props.project);
+      setIsAllocated(true);
     }
   };
 
   const rejectedCheckmarkChange = () => {
     if (isAllocated) {
-      // throw error
+      coreService.remove_allocation(props.team, props.project);
+      coreService.set_rejection(props.team, props.project);
+      setIsAllocated(false);
+      setIsRejected(true);
     } else if (isRejected) {
-      // remove rejection
+      coreService.remove_rejection(props.team, props.project);
+      setIsRejected(false);
     } else {
-      // add rejection
+      coreService.set_rejection(props.team, props.project);
+      setIsRejected(false);
     }
   };
 
