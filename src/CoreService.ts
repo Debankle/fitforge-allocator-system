@@ -9,21 +9,14 @@ class CoreService {
   private preference_scalar: number = 1;
   private b_values: number[][] = [[]];
   private num_teams_to_project: number[] = [];
-  private allocations: number[][] = [];
-  private rejections: number[][] = [];
-  private allocation_sets: number[][][] = [];
+  private allocations: number[][] = [[]];
+  private rejections: number[][] = [[]];
+  private allocation_sets: number[][][] = [[[]]];
   private num_teams: number = 0;
   private num_projects: number = 0;
   private min: number = Infinity;
   private max: number = -Infinity;
-
-  getNumTeams(): number {
-    return this.num_teams;
-  }
-
-  getNumProjects(): number {
-    return this.num_projects;
-  }
+  public isDataLoaded: boolean = false;
 
   saveState(filename: string): void {
     const currentState: State = {
@@ -64,11 +57,13 @@ class CoreService {
     this.allocations = [[]];
     this.rejections = [[]];
     this.soft_reset();
+    this.isDataLoaded = false;
   }
 
   soft_reset(): void {
     this.fit_scalar = 1;
     this.preference_scalar = 1;
+    this.allocation_sets = [[[]]];
     this.calculate_b_values();
   }
 
@@ -84,6 +79,7 @@ class CoreService {
         this.b_values[i][j] = a;
       }
     }
+    this.isDataLoaded = true;
   }
 
   initialise_values(props: Setup): void {
@@ -189,7 +185,6 @@ class CoreService {
       console.log(alloc_set);
       if (alloc_set["feasible"] == true) {
         for (const key in alloc_set) {
-          console.log(key);
           if (key != "feasible" && key != "result" && key != "bounded") {
             const set = key as string;
             allocation_set.push([parseInt(set[2]), parseInt(set[4])]);
@@ -205,7 +200,7 @@ class CoreService {
   }
 
   get_pairing_data(team: number, project: number): Pairing {
-    if (team >= 1 && project < 1) {
+    if (team >= 1 && project == 0 && team <= this.num_teams) {
       return {
         fit_value: -1,
         pref_value: -1,
@@ -243,6 +238,9 @@ class CoreService {
   }
 
   get_bg_color(bvalue: number): string {
+    if (bvalue == -1) {
+        return '0,0,180,';
+    }
     let val = Math.round(((bvalue - this.min) / (this.max - this.min)) * 255);
     let rbga = (255 - val).toString() + "," + val.toString() + ",0,";
     return rbga;
@@ -256,11 +254,20 @@ class CoreService {
   }
 
   is_pairing_allocated(team: number, project: number): boolean {
+    if (this.allocations[team - 1][1] == project) return true;
     return false;
   }
 
   is_pairing_rejected(team: number, project: number): boolean {
-    return false;
+    if (
+      this.rejections.some((row) =>
+        row.every((value, index) => value === [team, project][index])
+      )
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 

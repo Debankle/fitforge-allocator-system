@@ -30,7 +30,10 @@ const NavBar: React.FC<NavBarProps> = ({ setActiveView }) => {
         >
           Allocations
         </li>
-        <li className="text-white cursor-pointer hover:text-gray-400">
+        <li
+          className="text-white cursor-pointer hover:text-gray-400"
+          onClick={() => setActiveView("Rejections")}
+        >
           Rejections
         </li>
         <li

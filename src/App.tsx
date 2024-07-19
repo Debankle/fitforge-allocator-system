@@ -1,36 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InputComponent from "./components/InputComponent";
 import Toolbar from "./components/Toolbar";
 import NavBar from "./components/NavBar";
 import PairingDiv from "./components/Pairing";
 import { useCoreService } from "./CoreServiceContext";
-import ListView from "./components/views/ListView";
 import SpreadsheetView from "./components/views/SpreadsheetView";
+import Allocations from "./components/views/Allocations";
+import Algorithm from "./components/views/Algorithm";
+import Rejections from "./components/views/Rejections";
 
 function App() {
   // NOTE: Rewrite this to be a function state so data can be passed as needed idk if thats needed
   const [activeComponent, setActiveComponent] = useState("Upload");
   const coreService = useCoreService();
+  const [isDataLoaded, setIsDataLoaded] = useState(coreService.isDataLoaded);
+
+  useEffect(() => {
+    setIsDataLoaded(coreService.isDataLoaded);
+  }, [activeComponent]);
 
   const renderComponent = () => {
-    /* Pass setActiveComponent to each subcomponent so they can call it when needed
-    <Component switchComponent={setActiveComponent} />
-    function Component({switchComponent}) { ... }
-    */
+    if (!isDataLoaded) return <InputComponent />;
     switch (activeComponent) {
       case "Upload":
         return <InputComponent />;
       case "Algorithm":
-        return <div>Algorithm view</div>;
+        return <Algorithm />;
       case "Spreadsheet":
-        return <></>;
-        // return <SpreadsheetView />;
+        return <SpreadsheetView />;
       case "Allocations":
-        return <ListView />;
+        return <Allocations />;
+      case "Rejections":
+        return <Rejections />;
       case "Pairing":
         return <PairingDiv team={2} project={2} />;
       default:
-        return <div>Default view probably upload as well</div>;
+        return <InputComponent />;
     }
   };
   return (
