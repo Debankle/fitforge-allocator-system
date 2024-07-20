@@ -1,6 +1,5 @@
 import { ChangeEvent, useState, useEffect } from "react";
-import readXlsxFile from "read-excel-file";
-import * as XLSX from "xlsx";
+import readXlsxFile, { readSheetNames } from "read-excel-file";
 import { useCoreService } from "../CoreServiceContext";
 
 interface Setup {
@@ -85,19 +84,23 @@ function InputComponent() {
       const pref: number[][] = [];
       const n: number[] = [];
 
-      sheetNames.forEach((sheetName, index) => {
-        if (sheetTags[sheetName] === "Fit" || sheetTags[sheetName] === "Pref") {
-          // Adjust the index for 1-based indexing
-          promises.push(
-            readFromExcelSheet(sheet, index + 1, sheetTags[sheetName])
-          );
-        }
+      files.forEach((file) => {
+        const fileName = file.name;
+        const fileSheetNames = sheetNames[fileName];
+        const fileSheetTags = sheetTags[fileName];
+
+        fileSheetNames.forEach((sheetName) => {
+          const tag = fileSheetTags[sheetName];
+          if (tag === "Fit" || tag === "Pref") {
+            promises.push(readFromExcelSheet(file, sheetName, tag));
+          }
+        });
       });
 
       Promise.all(promises)
         .then((results) => {
           results.forEach(({ data, tag }) => {
-            // console.log(`Data for ${tag} sheet:`, data); // Added for debugging
+            console.log(`Data for ${tag} sheet:`, data); 
             if (tag === "Fit") {
               fit.push(...data);
             } else if (tag === "Pref") {
@@ -108,8 +111,8 @@ function InputComponent() {
           const setupParams: Setup = {
             fit_vals: fit,
             pref_vals: pref,
-            num_teams_to_project: new Array(fit.length).fill(1),
-            sheet_tags: sheetTags,
+            num_teams_to_project: new Array(fit[0].length).fill(1),
+            sheet_tags: Object.assign({}, ...Object.values(sheetTags)),
           };
 
           coreService.initialise_values(setupParams);
@@ -136,10 +139,10 @@ function InputComponent() {
           const dataArray: number[][] = [];
           for (let i = 1; i < rows.length; i++) {
             dataArray[i - 1] = [];
-            for (let j = 1; j < data[0].length; j++) {
-              const cellValue = data[i][j];
+            for (let j = 1; j < rows[0].length; j++) {
+              const cellValue = rows[i][j];
               if (typeof cellValue === "number") {
-                dataArray[i - 1][j - 1] = cellValue;
+                dataArray[i - 1][j-1] = cellValue;
               }
             }
           }
@@ -169,28 +172,30 @@ function InputComponent() {
             Please select the sheet containing the Fit Data and the sheet
             containing the Preference Data:
           </h3>
-          <ul>
-            {sheetNames.map((name, index) => (
-              <li
-                key={index}
-                style={{ marginBottom: "10px", fontSize: "18px" }}
-              >
-                {name}
-                <div>
-                  <select
-                    value={sheetTags[name]}
-                    onChange={(e) => handleTagChange(name, e.target.value)}
-                    style={{ marginLeft: "10px" }}
-                    disabled={processing}
-                  >
-                    <option value="">Select Tag</option>
-                    <option value="Fit">Fit</option>
-                    <option value="Pref">Pref</option>
-                  </select>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {Object.entries(sheetNames).map(([fileName, names]) => (
+            <div key={fileName}>
+              <h4>{fileName}</h4>
+              <ul>
+                {names.map((name, index) => (
+                  <li key={index} style={{ marginBottom: "10px", fontSize: "18px" }}>
+                    {name}
+                    <div>
+                      <select
+                        value={sheetTags[fileName][name]}
+                        onChange={(e) => handleTagChange(fileName, name, e.target.value)}
+                        style={{ marginLeft: "10px" }}
+                        disabled={processing}
+                      >
+                        <option value="">Select Tag</option>
+                        <option value="Fit">Fit</option>
+                        <option value="Pref">Pref</option>
+                      </select>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       )}
 
