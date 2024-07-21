@@ -3,9 +3,14 @@
 ## TODO:
 
 ### Oliver:
-- Implement allocation and rejection logic in CoreService
-- Get Pairing div to reload with b value recalculation
-- Implement save file functionality
+- PairingDiv
+    - reload on data change properly
+    - move navigation options to make sense
+- Google sheets loading on InputComponent
+- Enable navigation through PairingDiv
+- Spreadsheet view working
+- clean up code and add comments for clarity
+
 
 ## Testing Data
 
