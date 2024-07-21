@@ -1,6 +1,6 @@
 import { useCoreService } from "../CoreServiceContext";
 import { Pairing } from "../interfaces";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 interface Props {
   team: number;
@@ -16,13 +16,31 @@ function PairingDiv(props: Props) {
   const [isRejected, setIsRejected] = useState<boolean>(
     coreService.is_pairing_rejected(props.team, props.project)
   );
-  const pairingData: Pairing = coreService.get_pairing_data(
-    props.team,
-    props.project
+  const [pairingData, setPairingData] = useState<Pairing>(
+    coreService.get_pairing_data(props.team, props.project)
   );
   const bgColor: string = coreService.get_bg_color(pairingData.b_value);
   const allocatedCheckmark = useId();
   const rejectedCheckmark = useId();
+
+  useEffect(() => {
+    const updateData = () => {
+      setPairingData(coreService.get_pairing_data(props.team, props.project));
+      setIsRejected(coreService.is_pairing_rejected(props.team, props.project));
+      setIsAllocated(
+        coreService.is_pairing_allocated(props.team, props.project)
+      );
+    };
+
+    updateData();
+
+    const listener = () => updateData();
+    coreService.addListener(listener);
+
+    return () => {
+      coreService.removeListener(listener);
+    };
+  }, [props.team, props.project, coreService]);
 
   const allocatedCheckmarkChange = () => {
     if (isRejected) {

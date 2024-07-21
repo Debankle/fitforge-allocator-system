@@ -45,11 +45,11 @@ function ListView(props: ListProps) {
       >
         <option value="fit_value">Fit Value</option>
         <option value="pref_value">Preference Value</option>
-        <option value="fit_scalar">Fit Scalar</option>
-        <option value="pref_scalar">Preference Scalar</option>
         <option value="b_value">B Value</option>
         <option value="team">Team</option>
         <option value="project">Project</option>
+        <option value="fit_scalar">Fit Scalar</option>
+        <option value="pref_scalar">Preference Scalar</option>
       </select>
       <label>-</label>
       <select onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}>

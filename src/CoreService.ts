@@ -1,7 +1,6 @@
 import ILPAllocator from "./algorithms/ILP";
-import { Setup, State, Pairing } from "./interfaces";
+import { Setup, State, Pairing, AllocationSet } from "./interfaces";
 import StateSaver from "./StateIO";
-import { AllocationSet } from "./interfaces";
 
 class CoreService {
   private fit_values: number[][] = [[]];
@@ -18,6 +17,19 @@ class CoreService {
   private min: number = Infinity;
   private max: number = -Infinity;
   public isDataLoaded: boolean = false;
+  private listeners: Set<() => void> = new Set();
+
+  addListener(listener: () => void): void {
+    this.listeners.add(listener);
+  }
+
+  removeListener(listener: () => void): void {
+    this.listeners.delete(listener);
+  }
+
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => listener());
+  }
 
   get_num_teams(): number {
     return this.num_teams;
@@ -89,6 +101,7 @@ class CoreService {
       }
     }
     this.isDataLoaded = true;
+    this.notifyListeners();
   }
 
   initialise_values(props: Setup): void {
