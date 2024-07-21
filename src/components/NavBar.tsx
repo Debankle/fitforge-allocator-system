@@ -30,7 +30,10 @@ const NavBar: React.FC<NavBarProps> = ({ setActiveView }) => {
         >
           Allocations
         </li>
-        <li className="text-white cursor-pointer hover:text-gray-400">
+        <li
+          className="text-white cursor-pointer hover:text-gray-400"
+          onClick={() => setActiveView("Rejections")}
+        >
           Rejections
         </li>
         <li
@@ -38,6 +41,18 @@ const NavBar: React.FC<NavBarProps> = ({ setActiveView }) => {
           onClick={() => setActiveView("Pairing")}
         >
           Pairing test
+        </li>
+        <li
+          className="text-white cursor-pointer hover:text-gray-400"
+          onClick={() => setActiveView("ProjectList")}
+        >
+          Project List
+        </li>
+        <li
+          className="text-white cursor-pointer hover:text-gray-400"
+          onClick={() => setActiveView("TeamList")}
+        >
+          Team List
         </li>
       </ul>
     </div>

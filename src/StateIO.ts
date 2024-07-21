@@ -1,39 +1,61 @@
 import { State } from "./interfaces";
 
 class StateSaver {
-  static save(filePath: string, data: State): void {
+  static async save(filename: string, data: State): Promise<void> {
     const content = this.convertToFormat(data);
-    this.writeToFile(filePath, content);
+    const blob = new Blob([content], { type: "application/txt" });
+    const href = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = href;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(href);
   }
 
-  static load(filePath: string): State {
-    const fileContent = this.readFromFile(filePath);
+  static async load(file: File): Promise<State> {
+    const fileContent = await this.readFromFile(file);
     return this.convertFromFormat(fileContent);
   }
 
   private static convertToFormat(data: State): string {
-    return JSON.stringify(data);
+    return "<FFASv1.0>\n" + JSON.stringify(data);
   }
 
   private static convertFromFormat(content: string): State {
-    return {
-      fit_values: [[]],
-      preference_values: [[]],
-      fit_scalar: 0,
-      preference_scalar: 0,
-      num_teams_to_project: [],
-      allocations: [[]],
-      rejections: [[]],
-      allocation_sets: [[[]]]
-    };
+    try {
+      const parsedState: State = JSON.parse(content);
+      return parsedState;
+    } catch (error) {
+      throw new Error("Error parsing JSON: " + error);
+    }
   }
 
-  private static writeToFile(filePath: string, content: string): void {
-    console.log(filePath, content);
-  }
-
-  private static readFromFile(filePath: string): string {
-    return filePath;
+  private static readFromFile(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          const fileText = e.target.result as string;
+          const splitFileContent = fileText.split("\n");
+          if (
+            splitFileContent.length == 2 &&
+            splitFileContent[0] == "<FFASv1.0>"
+          ) {
+            resolve(splitFileContent[1]);
+          } else {
+            reject(new Error("Invalid File format"));
+          }
+        } else {
+          reject(new Error("File reading error"));
+        }
+      };
+      reader.onerror = () => {
+        reject(new Error("File reading error"));
+      };
+      reader.readAsText(file);
+    });
   }
 }
 

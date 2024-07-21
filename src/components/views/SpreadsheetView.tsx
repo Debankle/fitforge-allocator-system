@@ -1,20 +1,10 @@
 import { useState, useEffect } from "react";
-import * as xlsx from "xlsx";
 import { multiply, add } from "mathjs";
+import { Pairing } from "../../interfaces";
 
 // TypeScript type definitions and interfaces
 type SheetData = number[][];
 type PreferencesMatrix = number[][];
-
-interface Pairing {
-  team: number;
-  project: number;
-  fit_value: number;
-  pref_value: number;
-  b_value: number;
-  fit_scalar: number;
-  pref_scalar: number;
-}
 
 interface MatchResults {
   teamMatches: Record<string, string>;
@@ -23,15 +13,16 @@ interface MatchResults {
 
 // Function to read data from Excel sheet and convert to 2D array
 const readSheet = (filePath: string, sheetName: string): SheetData => {
-  const workbook = xlsx.readFile(filePath);
-  const sheet = workbook.Sheets[sheetName];
-  const data = xlsx.utils.sheet_to_json(sheet, { header: 1 }) as (
-    | string
-    | number
-  )[][];
+//   const workbook = xlsx.readFile(filePath);
+//   const sheet = workbook.Sheets[sheetName];
+//   const data = xlsx.utils.sheet_to_json(sheet, { header: 1 }) as (
+//     | string
+//     | number
+//   )[][];
 
-  // Remove header row and convert data to numbers
-  return data.slice(1).map((row) => row.slice(1).map((cell) => Number(cell)));
+//   // Remove header row and convert data to numbers
+//   return data.slice(1).map((row) => row.slice(1).map((cell) => Number(cell)));
+    return [[]]
 };
 
 // Merge three preference sheets into a single preferences matrix
