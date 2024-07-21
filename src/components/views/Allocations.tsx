@@ -14,7 +14,7 @@ function Allocations() {
 
       <ListView
         title={"Allocated Pairings"}
-        pairings={coreSerivce.get_allocations()} s
+        pairings={coreSerivce.get_allocations()}
       />
     </div>
   );
