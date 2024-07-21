@@ -10,20 +10,11 @@ function Allocations() {
     */
   return (
     <div>
-      <label>Sort by:</label>
-      <select>
-        <option value="B value">B Value</option>
-      </select>
-      <label>-</label>
-      <select>
-        <option value="Descending">Descending</option>
-      </select>
-
       <label>Score: {coreSerivce.get_score()}</label>
 
       <ListView
         title={"Allocated Pairings"}
-        pairings={coreSerivce.get_allocations()}
+        pairings={coreSerivce.get_allocations()} s
       />
     </div>
   );

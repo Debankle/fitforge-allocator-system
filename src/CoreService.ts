@@ -19,6 +19,14 @@ class CoreService {
   private max: number = -Infinity;
   public isDataLoaded: boolean = false;
 
+  get_num_teams(): number {
+    return this.num_teams;
+  }
+
+  get_num_projects(): number {
+    return this.num_projects;
+  }
+
   saveState(filename: string): void {
     const currentState: State = {
       fit_values: this.fit_values,
@@ -187,7 +195,10 @@ class CoreService {
         for (const key in alloc_set) {
           if (key != "feasible" && key != "result" && key != "bounded") {
             const set = key as string;
-            allocations.push([parseInt(set[2]), parseInt(set[4])]);
+            const alloc_split = set.split("_");
+            if (alloc_split.length == 3) {
+              allocations.push([parseInt(alloc_split[1]), parseInt(alloc_split[2])]);
+            }
           }
         }
         const allocation: AllocationSet = {

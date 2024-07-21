@@ -8,6 +8,8 @@ import SpreadsheetView from "./components/views/SpreadsheetView";
 import Allocations from "./components/views/Allocations";
 import Algorithm from "./components/views/Algorithm";
 import Rejections from "./components/views/Rejections";
+import ProjectList from "./components/views/ProjectList";
+import TeamList from "./components/views/TeamList";
 
 function App() {
   // NOTE: Rewrite this to be a function state so data can be passed as needed idk if thats needed
@@ -34,6 +36,10 @@ function App() {
         return <Rejections />;
       case "Pairing":
         return <PairingDiv team={2} project={2} />;
+      case "ProjectList":
+        return <ProjectList team={1} />;
+      case "TeamList":
+        return <TeamList project={1} />;
       default:
         return <InputComponent />;
     }
