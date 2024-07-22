@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useCoreService } from "../CoreServiceContext";
 
 function Toolbar() {
@@ -6,6 +6,11 @@ function Toolbar() {
   const [prefScale, setPrefScale] = useState<number>(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coreService = useCoreService();
+
+  useEffect(() => {
+    setFitScale(coreService.get_fit_scalar());
+    setPrefScale(coreService.get_pref_scalar());
+  }, [coreService]);
 
   const handleFitScaleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFitScale(parseFloat(e.target.value));

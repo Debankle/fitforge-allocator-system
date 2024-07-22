@@ -1,6 +1,7 @@
 import { useCoreService } from "../CoreServiceContext";
 import { Pairing } from "../interfaces";
 import { useEffect, useId, useState } from "react";
+import { useNavigation } from "../NavServiceContext";
 
 interface Props {
   team: number;
@@ -9,6 +10,7 @@ interface Props {
 
 function PairingDiv(props: Props) {
   const coreService = useCoreService();
+  const { navigate } = useNavigation();
   const [hover, setHover] = useState<boolean>(false);
   const [isAllocated, setIsAllocated] = useState<boolean>(
     coreService.is_pairing_allocated(props.team, props.project)
@@ -77,11 +79,11 @@ function PairingDiv(props: Props) {
   };
 
   const teamList = () => {
-    console.log("Load project pairings for team " + props.team);
+    navigate({ page: "ProjectList", data: { team: props.team } });
   };
 
   const projectList = () => {
-    console.log("Load team pairings for project " + props.project);
+    navigate({ page: "TeamList", data: { project: props.project } });
   };
 
   var styleSheet: any;

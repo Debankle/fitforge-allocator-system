@@ -28,7 +28,7 @@ class CoreService {
   }
 
   private notifyListeners(): void {
-    this.listeners.forEach(listener => listener());
+    this.listeners.forEach((listener) => listener());
   }
 
   get_num_teams(): number {
@@ -89,6 +89,8 @@ class CoreService {
   }
 
   calculate_b_values(): void {
+    this.min = Infinity;
+    this.max = -Infinity;
     for (let i = 0; i < this.num_teams; i++) {
       this.b_values[i] = [];
       for (let j = 0; j < this.num_projects; j++) {
@@ -122,6 +124,14 @@ class CoreService {
   set_pref_scalar(pref_scale: number): void {
     this.preference_scalar = pref_scale;
     this.calculate_b_values();
+  }
+
+  get_fit_scalar(): number {
+    return this.fit_scalar;
+  }
+
+  get_pref_scalar(): number {
+    return this.preference_scalar;
   }
 
   set_initial_allocations(): void {
@@ -210,7 +220,10 @@ class CoreService {
             const set = key as string;
             const alloc_split = set.split("_");
             if (alloc_split.length == 3) {
-              allocations.push([parseInt(alloc_split[1]), parseInt(alloc_split[2])]);
+              allocations.push([
+                parseInt(alloc_split[1]),
+                parseInt(alloc_split[2]),
+              ]);
             }
           }
         }

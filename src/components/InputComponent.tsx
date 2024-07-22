@@ -1,6 +1,7 @@
 import { ChangeEvent, useState, useEffect } from "react";
 import readXlsxFile, { readSheetNames } from "read-excel-file";
 import { useCoreService } from "../CoreServiceContext";
+import { useNavigation } from "../NavServiceContext";
 
 interface Setup {
   fit_vals: number[][];
@@ -15,11 +16,16 @@ interface SheetTags {
 
 function InputComponent() {
   const [files, setFiles] = useState<File[]>([]);
-  const [sheetNames, setSheetNames] = useState<{ [fileName: string]: string[] }>({});
-  const [sheetTags, setSheetTags] = useState<{ [fileName: string]: SheetTags }>({});
+  const [sheetNames, setSheetNames] = useState<{
+    [fileName: string]: string[];
+  }>({});
+  const [sheetTags, setSheetTags] = useState<{ [fileName: string]: SheetTags }>(
+    {}
+  );
   const [processing, setProcessing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const coreService = useCoreService();
+  const { navigate } = useNavigation();
 
   useEffect(() => {
     setSheetNames({});
@@ -69,7 +75,11 @@ function InputComponent() {
     }
   };
 
-  const handleTagChange = (fileName: string, sheetName: string, tag: string) => {
+  const handleTagChange = (
+    fileName: string,
+    sheetName: string,
+    tag: string
+  ) => {
     setSheetTags({
       ...sheetTags,
       [fileName]: { ...sheetTags[fileName], [sheetName]: tag },
@@ -100,7 +110,7 @@ function InputComponent() {
       Promise.all(promises)
         .then((results) => {
           results.forEach(({ data, tag }) => {
-            console.log(`Data for ${tag} sheet:`, data); 
+            console.log(`Data for ${tag} sheet:`, data);
             if (tag === "Fit") {
               fit.push(...data);
             } else if (tag === "Pref") {
@@ -117,6 +127,7 @@ function InputComponent() {
 
           coreService.initialise_values(setupParams);
           coreService.run_algorithm("ILP");
+          navigate({ page: "Algorithm", data: null });
         })
         .catch((error) => {
           console.error("Error processing data:", error);
@@ -142,7 +153,7 @@ function InputComponent() {
             for (let j = 1; j < rows[0].length; j++) {
               const cellValue = rows[i][j];
               if (typeof cellValue === "number") {
-                dataArray[i - 1][j-1] = cellValue;
+                dataArray[i - 1][j - 1] = cellValue;
               }
             }
           }
@@ -177,12 +188,17 @@ function InputComponent() {
               <h4>{fileName}</h4>
               <ul>
                 {names.map((name, index) => (
-                  <li key={index} style={{ marginBottom: "10px", fontSize: "18px" }}>
+                  <li
+                    key={index}
+                    style={{ marginBottom: "10px", fontSize: "18px" }}
+                  >
                     {name}
                     <div>
                       <select
                         value={sheetTags[fileName][name]}
-                        onChange={(e) => handleTagChange(fileName, name, e.target.value)}
+                        onChange={(e) =>
+                          handleTagChange(fileName, name, e.target.value)
+                        }
                         style={{ marginLeft: "10px" }}
                         disabled={processing}
                       >

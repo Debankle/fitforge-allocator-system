@@ -10,20 +10,20 @@ import Algorithm from "./components/views/Algorithm";
 import Rejections from "./components/views/Rejections";
 import ProjectList from "./components/views/ProjectList";
 import TeamList from "./components/views/TeamList";
+import { useNavigation } from "./NavServiceContext";
 
 function App() {
-  // NOTE: Rewrite this to be a function state so data can be passed as needed idk if thats needed
-  const [activeComponent, setActiveComponent] = useState("Upload");
   const coreService = useCoreService();
+  const { currentPage } = useNavigation();
   const [isDataLoaded, setIsDataLoaded] = useState(coreService.isDataLoaded);
 
   useEffect(() => {
     setIsDataLoaded(coreService.isDataLoaded);
-  }, [activeComponent]);
+  }, [currentPage]);
 
   const renderComponent = () => {
     if (!isDataLoaded) return <InputComponent />;
-    switch (activeComponent) {
+    switch (currentPage.page) {
       case "Upload":
         return <InputComponent />;
       case "Algorithm":
@@ -35,11 +35,16 @@ function App() {
       case "Rejections":
         return <Rejections />;
       case "Pairing":
-        return <PairingDiv team={2} project={2} />;
+        return (
+          <PairingDiv
+            team={currentPage.data.team}
+            project={currentPage.data.project}
+          />
+        );
       case "ProjectList":
-        return <ProjectList team={1} />;
+        return <ProjectList team={currentPage.data.team} />;
       case "TeamList":
-        return <TeamList project={1} />;
+        return <TeamList project={currentPage.data.project} />;
       default:
         return <InputComponent />;
     }
@@ -47,25 +52,7 @@ function App() {
   return (
     <>
       <Toolbar />
-      <NavBar setActiveView={setActiveComponent} />
-
-      {/* Plans for this section
-        Toolbar for testing features
-        - reset
-        - upload when data is already uploaded
-        - save current state
-        - etc
-        
-        menu bar for switching between views
-        - List view
-        - Spreadsheet
-        - others
-        - etc
-
-        view for subcomponent
-        render the current layout in use
-        be able to switch between them
-        */}
+      <NavBar />
 
       {renderComponent()}
     </>
