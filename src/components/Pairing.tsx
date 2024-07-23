@@ -6,6 +6,8 @@ import { useNavigation } from "../NavServiceContext";
 interface Props {
   team: number;
   project: number;
+  isShown: boolean;
+  onToggle: () => void;
 }
 
 function PairingDiv(props: Props) {
@@ -24,6 +26,7 @@ function PairingDiv(props: Props) {
   const bgColor: string = coreService.get_bg_color(pairingData.b_value);
   const allocatedCheckmark = useId();
   const rejectedCheckmark = useId();
+  const isShown = true;
 
   useEffect(() => {
     const updateData = () => {
@@ -78,6 +81,13 @@ function PairingDiv(props: Props) {
     setHover(!hover);
   };
 
+  const spreadsheet = () => {
+    navigate({
+      page: "Spreadsheet",
+      data: { team: props.team, project: props.project },
+    });
+  };
+
   const teamList = () => {
     navigate({ page: "ProjectList", data: { team: props.team } });
   };
@@ -86,30 +96,29 @@ function PairingDiv(props: Props) {
     navigate({ page: "TeamList", data: { project: props.project } });
   };
 
+  const handleBackgroundClick = (_: React.MouseEvent<HTMLDivElement>) => {
+      props.onToggle();    
+  };
+
   var styleSheet: any;
   if (hover) {
-    styleSheet = { backgroundColor: "rgba(" + bgColor + "0.5)" };
+    styleSheet = { backgroundColor: "rgba(" + bgColor + "0.5)", display: 'inline-block', transition:'all 0.3s' };
   } else {
-    styleSheet = { backgroundColor: "rgba(" + bgColor + "1)" };
+    styleSheet = { backgroundColor: "rgba(" + bgColor + "1)", display: 'inline-block', transition: 'all 0.3s' };
   }
 
   return (
     <div
-      className="flex flex-col"
+      className="flex flex-col m-1"
       style={styleSheet}
       onMouseEnter={toggleHover}
       onMouseLeave={toggleHover}
+      onClick={handleBackgroundClick}
     >
-      <div className="flex">
-        <div className="flex-1 flex flex-col justify-center">
+      <div className="flex p-2">
+        <div className="flex-1 flex flex-col justify-center ml-2">
           <div className="text-xl font-bold">Team:</div>
           <div className="text-2xl">{props.team}</div>
-          <button
-            className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-            onClick={teamList}
-          >
-            Team {props.team} project list
-          </button>
         </div>
 
         <div className="flex-1 flex flex-col items-center">
@@ -153,6 +162,7 @@ function PairingDiv(props: Props) {
                 type="checkbox"
                 checked={isAllocated}
                 onChange={allocatedCheckmarkChange}
+                onClick={(e) => e.stopPropagation()}
               ></input>
             </div>
             <div>
@@ -164,23 +174,51 @@ function PairingDiv(props: Props) {
                 type="checkbox"
                 checked={isRejected}
                 onChange={rejectedCheckmarkChange}
+                onClick={(e) => e.stopPropagation()}
               ></input>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col justify-center items-end text-right">
+        <div className="flex-1 flex flex-col justify-center items-end text-right mr-3">
           <div className="text-xl font-bold">Project:</div>
           <div className="text-2xl">
             {pairingData.project == -1 ? "-" : props.project}
           </div>
-          <button
-            className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-            onClick={projectList}
-          >
-            Project {props.project} team list
-          </button>
         </div>
+
+        {/*props.isShown will hide this and allow for toggles, but it seems to look better without, idk im not the UI guy */}
+        {isShown && (
+          <div className="flex-1 flex flex-col justify-center items-end text-right ml-2 mr-2">
+            <button
+              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-bue-700 mt-1 mb-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                spreadsheet();
+              }}
+            >
+              Show in spreadsheet
+            </button>
+            <button
+              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700 mt-1 mb-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                teamList();
+              }}
+            >
+              Team {props.team} project list
+            </button>
+            <button
+              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700 mt-1 mb-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                projectList();
+              }}
+            >
+              Project {props.project} team list
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ function ListView(props: ListProps) {
   const [pairingData, setPairingData] = useState<Pairing[]>([]);
   const [sortProperty, setSortProperty] = useState<keyof Pairing>("team");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +36,12 @@ function ListView(props: ListProps) {
     if (compareA > compareB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
+
+  const handleToggle = (index: number) => {
+    setExpandedIndex((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
 
   return (
     <div>
@@ -64,10 +71,16 @@ function ListView(props: ListProps) {
           </tr>
         </thead>
         <tbody>
-          {sortedPairingData.map((pairing) => (
+          {sortedPairingData.map((pairing, index) => (
             <tr key={`${pairing.team}-${pairing.project}`}>
               <td>
-                <PairingDiv team={pairing.team} project={pairing.project} />
+                <PairingDiv
+                  team={pairing.team}
+                  project={pairing.project}
+                  key={index}
+                  isShown={expandedIndex.includes(index)}
+                  onToggle={() => handleToggle(index)}
+                />
               </td>
             </tr>
           ))}

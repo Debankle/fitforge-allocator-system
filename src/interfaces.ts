@@ -39,8 +39,7 @@ export type NavPage =
   | "Rejections"
   | "ProjectList"
   | "TeamList"
-  | "Spreadsheet"
-  | "Pairing";
+  | "Spreadsheet";
 
 export interface PageView {
   page: NavPage;

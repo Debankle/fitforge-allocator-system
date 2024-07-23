@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import InputComponent from "./components/InputComponent";
 import Toolbar from "./components/Toolbar";
 import NavBar from "./components/NavBar";
-import PairingDiv from "./components/Pairing";
 import { useCoreService } from "./CoreServiceContext";
 import SpreadsheetView from "./components/views/SpreadsheetView";
 import Allocations from "./components/views/Allocations";
@@ -34,13 +33,6 @@ function App() {
         return <Allocations />;
       case "Rejections":
         return <Rejections />;
-      case "Pairing":
-        return (
-          <PairingDiv
-            team={currentPage.data.team}
-            project={currentPage.data.project}
-          />
-        );
       case "ProjectList":
         return <ProjectList team={currentPage.data.team} />;
       case "TeamList":
@@ -54,7 +46,7 @@ function App() {
       <Toolbar />
       <NavBar />
 
-      {renderComponent()}
+      <div className="flex justify-center items-center mt-2">{renderComponent()}</div>
     </>
   );
 }
