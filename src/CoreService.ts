@@ -106,6 +106,10 @@ class CoreService {
     this.notifyListeners();
   }
 
+  get_b_value(team: number, project: number): number {
+    return this.b_values[team - 1][project - 1];
+  }
+
   initialise_values(props: Setup): void {
     this.fit_values = props.fit_vals;
     this.preference_values = props.pref_vals;
@@ -288,6 +292,20 @@ class CoreService {
     let val = Math.round(((bvalue - this.min) / (this.max - this.min)) * 255);
     let rbga = (255 - val).toString() + "," + val.toString() + ",0,";
     return rbga;
+  }
+
+  get_cell_color(team: number, project: number): string {
+    if (this.is_pairing_allocated(team, project)) {
+      return "rgba(51,153,255,0.7)";
+    } else if (this.is_pairing_rejected(team, project)) {
+      return "rgba(73,80,87,0.7)";
+    } else {
+      return (
+        "rgba(" +
+        this.get_bg_color(this.b_values[team - 1][project - 1]) +
+        "0.5)"
+      );
+    }
   }
 
   log_dump() {

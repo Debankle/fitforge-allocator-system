@@ -1,132 +1,117 @@
-import { useState, useEffect } from "react";
-import { multiply, add } from "mathjs";
+import { useState } from "react";
+import CoreService from "../../CoreService";
 import { Pairing } from "../../interfaces";
+import { useCoreService } from "../../CoreServiceContext";
+import { useNavigation } from "../../NavServiceContext";
+import PairingDiv from "../Pairing";
+import { mod } from "mathjs";
 
-// TypeScript type definitions and interfaces
-type SheetData = number[][];
-type PreferencesMatrix = number[][];
+function SpreadsheetView() {
+  const coreService = useCoreService();
+  const { navigate } = useNavigation();
+  const [displayType, setDisplayType] = useState<
+    "Numbers" | "Colours" | "Both" | "Assigned"
+  >("Numbers");
+  const [isModalShown, setIsModalShown] = useState<boolean>(false);
+  const numTeams = coreService.get_num_teams();
+  const numProjects = coreService.get_num_projects();
+  const [modalTeam, setModalTeam] = useState<number>(0);
+  const [modalProject, setModalProject] = useState<number>(0);
 
-interface MatchResults {
-  teamMatches: Record<string, string>;
-  totalScore: number;
-}
-
-// Function to read data from Excel sheet and convert to 2D array
-const readSheet = (filePath: string, sheetName: string): SheetData => {
-//   const workbook = xlsx.readFile(filePath);
-//   const sheet = workbook.Sheets[sheetName];
-//   const data = xlsx.utils.sheet_to_json(sheet, { header: 1 }) as (
-//     | string
-//     | number
-//   )[][];
-
-//   // Remove header row and convert data to numbers
-//   return data.slice(1).map((row) => row.slice(1).map((cell) => Number(cell)));
-    return [[]]
-};
-
-// Merge three preference sheets into a single preferences matrix
-const mergePreferences = (
-  df: SheetData,
-  db: SheetData,
-  dg: SheetData
-): PreferencesMatrix => {
-  const combinedPreferences = add(df, db) as number[][];
-  return multiply(combinedPreferences, dg) as PreferencesMatrix;
-};
-
-const SpreadsheetView = () => {
-  // State variables to store data and manage selected pairing
-  const [df, setDf] = useState<SheetData>([]);
-  const [db, setDb] = useState<SheetData>([]);
-  const [dg, setDg] = useState<SheetData>([]);
-  const [combinedPreferences, setCombinedPreferences] =
-    useState<PreferencesMatrix>([]);
-  const [selectedPairing, setSelectedPairing] = useState<Pairing | null>(null);
-
-  // useEffect hook to load data on component mount
-  useEffect(() => {
-    const dfData = readSheet("../../tests/Sample1.xlsx", "Sheet1");
-    const dbData = readSheet("Book1.xlsx", "Sheet2");
-    const dgData = readSheet("Book1.xlsx", "Sheet3");
-
-    // Update state with data from Excel sheets and merged preferences
-    setDf(dfData);
-    setDb(dbData);
-    setDg(dgData);
-    setCombinedPreferences(mergePreferences(dfData, dbData, dgData));
-  }, []); // Empty dependency array ensures useEffect runs only once on mount
-
-  // Function to handle click events on table cells
-  const handleClick = (teamIndex: number, projectIndex: number) => {
-    // Prepare pairing data based on clicked cell coordinates
-    const pairingData: Pairing = {
-      team: teamIndex,
-      project: projectIndex,
-      fit_value: df[teamIndex][projectIndex],
-      pref_value: db[teamIndex][projectIndex],
-      b_value: combinedPreferences[teamIndex][projectIndex],
-      fit_scalar: dg[teamIndex][projectIndex],
-      pref_scalar: dg[teamIndex][projectIndex],
-    };
-    setSelectedPairing(pairingData); // Update selectedPairing state with the clicked pairing data
+  const handelCellClick = (team: number, project: number) => {
+    console.log(team, project, coreService.get_pairing_data(team, project));
+    setModalTeam(team);
+    setModalProject(project);
+    setIsModalShown(true);
   };
 
   return (
-    <div>
-      <h1>Spreadsheet View</h1>
-      <table className="table-auto border-collapse border border-gray-400">
-        <thead>
-          <tr>
-            <th className="border border-gray-300 px-4 py-2">Team/Project</th>
-            {/* Render table header based on number of projects */}
-            {Array.from(
-              { length: combinedPreferences[0]?.length || 0 },
-              (_, i) => (
+    <div className="relative">
+      <div>
+        <h1>Options for searching somehow i guess</h1>
+        <label>TODO:</label>
+        <ul>
+          <li>view options</li>
+          <li>Hover on row and column</li>
+          <li>colours on cells</li>
+          <li>fix left and top to side and only scroll data cells</li>
+          <li>Navigate to specific row/col/cell</li>
+        </ul>
+      </div>
+      <div className="relative overflow-auto max-w-full max-h-full">
+        <table className="table-auto border-collapse border border-gray-400 min-w-full">
+          <thead>
+            <tr>
+              <th className="border border-gray-300 px-4 py-2 sticky top-0 bg-white z-10 left-0">
+                Team/Project
+              </th>
+              {/* Render table header based on number of projects */}
+              {Array.from({ length: numProjects || 0 }, (_, projectIndex) => (
                 <th
-                  key={i}
-                  className="border border-gray-300 px-4 py-2"
-                >{`Project ${i + 1}`}</th>
-              )
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {/* Render table rows and cells based on data */}
-          {combinedPreferences.map((row, teamIndex) => (
-            <tr key={teamIndex}>
-              <td className="border border-gray-300 px-4 py-2">{`Team ${
-                teamIndex + 1
-              }`}</td>
-              {row.map((cell, projectIndex) => (
-                <td
-                  key={projectIndex}
-                  className="border border-gray-300 px-4 py-2 cursor-pointer"
-                  onClick={() => handleClick(teamIndex, projectIndex)}
+                  key={projectIndex + 1}
+                  className="border border-gray-300 px-4 py-2 sticky top-0 bg-white"
                 >
-                  {cell}
-                </td>
+                  Project {projectIndex + 1}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {/* Render table rows and cells based on data */}
+            {Array.from({ length: numTeams }, (_, teamIndex) => (
+              <tr key={teamIndex + 1}>
+                <td className="border border-gray-300 px-4 py-2 sticky left-0 bg-white z-10">
+                  Team {teamIndex + 1}
+                </td>
+                {Array.from({ length: numProjects }, (_, projectIndex) => (
+                  <td
+                    className="border border-gray-300 px-4 py-2 cursor-pointer"
+                    style={{
+                      backgroundColor: coreService.get_cell_color(
+                        teamIndex + 1,
+                        projectIndex + 1
+                      ),
+                    }}
+                    key={projectIndex + 1}
+                    onClick={() =>
+                      handelCellClick(teamIndex + 1, projectIndex + 1)
+                    }
+                  >
+                    {coreService.get_b_value(teamIndex + 1, projectIndex + 1)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Render selected pairing details if a pairing is selected */}
-      {selectedPairing && (
-        <div className="mt-4">
-          <h2>Selected Pairing Details</h2>
-          <p>Team: {selectedPairing.team + 1}</p>
-          <p>Project: {selectedPairing.project + 1}</p>
-          <p>Fit Value: {selectedPairing.fit_value}</p>
-          <p>Preference Value: {selectedPairing.pref_value}</p>
-          <p>B Value: {selectedPairing.b_value}</p>
-          <p>Fit Scalar: {selectedPairing.fit_scalar}</p>
-          <p>Pref Scalar: {selectedPairing.pref_scalar}</p>
+      {isModalShown && (
+        <div
+          onClick={() => setIsModalShown(false)}
+          className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <div
+            className="bg-white bg-opacity-100 rounded-lg shadow-ld w-full max-w-md relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <PairingDiv
+              team={modalTeam}
+              project={modalProject}
+              isShown={true}
+              onToggle={() => {}}
+            />
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-2x1"
+              onClick={() => setIsModalShown(false)}
+            >
+              &times;
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
-};
+}
 
 export default SpreadsheetView;

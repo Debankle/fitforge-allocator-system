@@ -38,14 +38,6 @@ function NavBar() {
         </li>
         <li
           className="text-white cursor-pointer hover:text-gray-400"
-          onClick={() =>
-            navigate({ page: "Pairing", data: { team: 1, project: 1 } })
-          }
-        >
-          Pairing test
-        </li>
-        <li
-          className="text-white cursor-pointer hover:text-gray-400"
           onClick={() => navigate({ page: "ProjectList", data: { team: 1 } })}
         >
           Project List
