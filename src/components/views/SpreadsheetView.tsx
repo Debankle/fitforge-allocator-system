@@ -1,10 +1,7 @@
 import { useState } from "react";
-import CoreService from "../../CoreService";
-import { Pairing } from "../../interfaces";
 import { useCoreService } from "../../CoreServiceContext";
 import { useNavigation } from "../../NavServiceContext";
 import PairingDiv from "../Pairing";
-import { mod } from "mathjs";
 
 function SpreadsheetView() {
   const coreService = useCoreService();
