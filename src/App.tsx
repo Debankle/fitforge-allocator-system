@@ -43,10 +43,14 @@ function App() {
   };
   return (
     <>
-      <Toolbar />
-      <NavBar />
+      <div className="sticky top-0">
+        <Toolbar />
+        <NavBar />
+      </div>
 
-      <div className="flex justify-center items-center mt-2">{renderComponent()}</div>
+      <div className="flex justify-center items-center mt-2">
+        {renderComponent()}
+      </div>
     </>
   );
 }

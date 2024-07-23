@@ -191,7 +191,7 @@ function PairingDiv(props: Props) {
         {isShown && (
           <div className="flex-1 flex flex-col justify-center items-end text-right ml-2 mr-2">
             <button
-              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-bue-700 mt-1 mb-1"
+              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700 mt-1 mb-1"
               onClick={(e) => {
                 e.stopPropagation();
                 spreadsheet();

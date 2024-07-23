@@ -3,13 +3,10 @@
 ## TODO:
 
 ### Oliver:
-- PairingDiv
-    - reload on data change properly
-    - move navigation options to make sense
 - Google sheets loading on InputComponent
-- Enable navigation through PairingDiv
-- Spreadsheet view working
 - clean up code and add comments for clarity
+- Spreadsheet view to be properly anchored and scrollable
+- navigation arrows in navbar to go back and forth with settings somehow?
 
 
 ## Testing Data
