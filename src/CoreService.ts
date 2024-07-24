@@ -140,7 +140,7 @@ class CoreService {
 
   set_initial_allocations(): void {
     for (let i = 1; i <= this.num_teams; i++) {
-      this.allocations.push([i, 0]);
+      this.allocations[i - 1] = [i, 0];
     }
   }
 
