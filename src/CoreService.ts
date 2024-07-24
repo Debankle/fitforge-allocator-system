@@ -1,7 +1,6 @@
 import ILPAllocator from "./algorithms/ILP";
-import { Setup, State, Pairing } from "./interfaces";
+import { Setup, State, Pairing, AllocationSet } from "./interfaces";
 import StateSaver from "./StateIO";
-import { AllocationSet } from "./interfaces";
 
 class CoreService {
   private fit_values: number[][] = [[]];
@@ -18,6 +17,19 @@ class CoreService {
   private min: number = Infinity;
   private max: number = -Infinity;
   public isDataLoaded: boolean = false;
+  private listeners: Set<() => void> = new Set();
+
+  addListener(listener: () => void): void {
+    this.listeners.add(listener);
+  }
+
+  removeListener(listener: () => void): void {
+    this.listeners.delete(listener);
+  }
+
+  private notifyListeners(): void {
+    this.listeners.forEach((listener) => listener());
+  }
 
   get_num_teams(): number {
     return this.num_teams;
@@ -77,6 +89,8 @@ class CoreService {
   }
 
   calculate_b_values(): void {
+    this.min = Infinity;
+    this.max = -Infinity;
     for (let i = 0; i < this.num_teams; i++) {
       this.b_values[i] = [];
       for (let j = 0; j < this.num_projects; j++) {
@@ -89,6 +103,11 @@ class CoreService {
       }
     }
     this.isDataLoaded = true;
+    this.notifyListeners();
+  }
+
+  get_b_value(team: number, project: number): number {
+    return this.b_values[team - 1][project - 1];
   }
 
   initialise_values(props: Setup): void {
@@ -111,9 +130,17 @@ class CoreService {
     this.calculate_b_values();
   }
 
+  get_fit_scalar(): number {
+    return this.fit_scalar;
+  }
+
+  get_pref_scalar(): number {
+    return this.preference_scalar;
+  }
+
   set_initial_allocations(): void {
     for (let i = 1; i <= this.num_teams; i++) {
-      this.allocations.push([i, 0]);
+      this.allocations[i - 1] = [i, 0];
     }
   }
 
@@ -197,7 +224,10 @@ class CoreService {
             const set = key as string;
             const alloc_split = set.split("_");
             if (alloc_split.length == 3) {
-              allocations.push([parseInt(alloc_split[1]), parseInt(alloc_split[2])]);
+              allocations.push([
+                parseInt(alloc_split[1]),
+                parseInt(alloc_split[2]),
+              ]);
             }
           }
         }
@@ -262,6 +292,20 @@ class CoreService {
     let val = Math.round(((bvalue - this.min) / (this.max - this.min)) * 255);
     let rbga = (255 - val).toString() + "," + val.toString() + ",0,";
     return rbga;
+  }
+
+  get_cell_color(team: number, project: number): string {
+    if (this.is_pairing_allocated(team, project)) {
+      return "rgba(51,153,255,0.7)";
+    } else if (this.is_pairing_rejected(team, project)) {
+      return "rgba(73,80,87,0.7)";
+    } else {
+      return (
+        "rgba(" +
+        this.get_bg_color(this.b_values[team - 1][project - 1]) +
+        "0.5)"
+      );
+    }
   }
 
   log_dump() {

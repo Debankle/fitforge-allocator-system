@@ -7,6 +7,7 @@ interface Setup {
   pref_vals: number[][];
   num_teams_to_project: number[];
   sheet_tags?: { [key: string]: string };
+  multi_team_projects?: { [projectId: string]: boolean }; // Updated to use project IDs
 }
 
 interface SheetTags {
@@ -15,8 +16,16 @@ interface SheetTags {
 
 function InputComponent() {
   const [files, setFiles] = useState<File[]>([]);
-  const [sheetNames, setSheetNames] = useState<{ [fileName: string]: string[] }>({});
-  const [sheetTags, setSheetTags] = useState<{ [fileName: string]: SheetTags }>({});
+  const [sheetNames, setSheetNames] = useState<{
+    [fileName: string]: string[];
+  }>({});
+  const [sheetTags, setSheetTags] = useState<{ [fileName: string]: SheetTags }>(
+    {}
+  );
+  const [projectOptions, setProjectOptions] = useState<string[]>([]);
+  const [multiTeamProjects, setMultiTeamProjects] = useState<{
+    [projectId: string]: boolean;
+  }>({});
   const [processing, setProcessing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const coreService = useCoreService();
@@ -24,6 +33,8 @@ function InputComponent() {
   useEffect(() => {
     setSheetNames({});
     setSheetTags({});
+    setProjectOptions([]);
+    setMultiTeamProjects({});
   }, [files]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +43,8 @@ function InputComponent() {
       setFiles(selectedFiles);
       setSheetNames({});
       setSheetTags({});
+      setProjectOptions([]);
+      setMultiTeamProjects({});
       setLoadError(null);
     }
   };
@@ -54,6 +67,7 @@ function InputComponent() {
             const fileName = file.name;
             newSheetNames[fileName] = sheetNamesArray;
             newSheetTags[fileName] = {};
+
             sheetNamesArray.forEach((name) => {
               newSheetTags[fileName][name] = "";
             });
@@ -69,11 +83,33 @@ function InputComponent() {
     }
   };
 
-  const handleTagChange = (fileName: string, sheetName: string, tag: string) => {
+  const handleTagChange = (
+    fileName: string,
+    sheetName: string,
+    tag: string
+  ) => {
     setSheetTags({
       ...sheetTags,
       [fileName]: { ...sheetTags[fileName], [sheetName]: tag },
     });
+  };
+
+  const handleMultiTeamChange = (
+    projectId: string,
+    canTakeMultipleTeams: boolean
+  ) => {
+    setMultiTeamProjects({
+      ...multiTeamProjects,
+      [projectId]: canTakeMultipleTeams,
+    });
+  };
+
+  const extractProjectsFromSheet = (data: number[][]): string[] => {
+    if (data.length > 0) {
+      // Assume first row is headers with project names
+      return data[0].map((_, index) => `Project ${index + 1}`);
+    }
+    return [];
   };
 
   const loadData = () => {
@@ -99,20 +135,27 @@ function InputComponent() {
 
       Promise.all(promises)
         .then((results) => {
+          const projects: string[] = [];
           results.forEach(({ data, tag }) => {
-            console.log(`Data for ${tag} sheet:`, data); 
             if (tag === "Fit") {
               fit.push(...data);
+              n.push(data.length);
+              if (projects.length === 0) {
+                projects.push(...extractProjectsFromSheet(data));
+              }
             } else if (tag === "Pref") {
               pref.push(...data);
             }
           });
 
+          setProjectOptions(projects);
+
           const setupParams: Setup = {
             fit_vals: fit,
             pref_vals: pref,
-            num_teams_to_project: new Array(fit[0].length).fill(1),
+            num_teams_to_project: n,
             sheet_tags: Object.assign({}, ...Object.values(sheetTags)),
+            multi_team_projects: multiTeamProjects, // Include this in setupParams
           };
 
           coreService.initialise_values(setupParams);
@@ -138,11 +181,11 @@ function InputComponent() {
         .then((rows) => {
           const dataArray: number[][] = [];
           for (let i = 1; i < rows.length; i++) {
-            dataArray[i - 1] = [];
+            dataArray[i-1] = [];
             for (let j = 1; j < rows[0].length; j++) {
               const cellValue = rows[i][j];
               if (typeof cellValue === "number") {
-                dataArray[i - 1][j-1] = cellValue;
+                dataArray[i - 1][j - 1] = cellValue;
               }
             }
           }
@@ -177,12 +220,17 @@ function InputComponent() {
               <h4>{fileName}</h4>
               <ul>
                 {names.map((name, index) => (
-                  <li key={index} style={{ marginBottom: "10px", fontSize: "18px" }}>
+                  <li
+                    key={index}
+                    style={{ marginBottom: "10px", fontSize: "18px" }}
+                  >
                     {name}
                     <div>
                       <select
                         value={sheetTags[fileName][name]}
-                        onChange={(e) => handleTagChange(fileName, name, e.target.value)}
+                        onChange={(e) =>
+                          handleTagChange(fileName, name, e.target.value)
+                        }
                         style={{ marginLeft: "10px" }}
                         disabled={processing}
                       >
@@ -196,6 +244,36 @@ function InputComponent() {
               </ul>
             </div>
           ))}
+        </div>
+      )}
+
+      {projectOptions.length > 0 && (
+        <div style={{ marginTop: "20px" }}>
+          <h3 style={{ marginBottom: "10px", fontSize: "24px" }}>
+            Select the projects that can handle multiple teams:
+          </h3>
+          <ul>
+            {projectOptions.map((project, index) => (
+              <li
+                key={index}
+                style={{ marginBottom: "10px", fontSize: "18px" }}
+              >
+                {project}
+                <input
+                  type="checkbox"
+                  checked={multiTeamProjects[project] || false}
+                  onChange={(e) =>
+                    handleMultiTeamChange(project, e.target.checked)
+                  }
+                  style={{ marginLeft: "10px" }}
+                  disabled={processing}
+                />
+                <label style={{ marginLeft: "5px" }}>
+                  Can Take Multiple Teams
+                </label>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -219,7 +297,7 @@ function InputComponent() {
         {processing ? "Processing..." : "Process Data"}
       </button>
 
-      {loadError && <p className="text-red-500">{loadError}</p>}
+      {loadError && <p style={{ color: "red" }}>{loadError}</p>}
     </div>
   );
 }

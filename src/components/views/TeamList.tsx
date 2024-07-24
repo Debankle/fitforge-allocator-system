@@ -26,7 +26,7 @@ function TeamList(props: Props) {
 
   return (
     <div>
-      <label htmlFor="project-select">Team:</label>
+      <label htmlFor="project-select">Project:</label>
       <select
         id="project-select"
         value={project}

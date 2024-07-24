@@ -13,6 +13,7 @@ function ListView(props: ListProps) {
   const [pairingData, setPairingData] = useState<Pairing[]>([]);
   const [sortProperty, setSortProperty] = useState<keyof Pairing>("team");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,6 +37,12 @@ function ListView(props: ListProps) {
     return 0;
   });
 
+  const handleToggle = (index: number) => {
+    setExpandedIndex((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
+
   return (
     <div>
       <label>Sort by:</label>
@@ -45,11 +52,11 @@ function ListView(props: ListProps) {
       >
         <option value="fit_value">Fit Value</option>
         <option value="pref_value">Preference Value</option>
-        <option value="fit_scalar">Fit Scalar</option>
-        <option value="pref_scalar">Preference Scalar</option>
         <option value="b_value">B Value</option>
         <option value="team">Team</option>
         <option value="project">Project</option>
+        <option value="fit_scalar">Fit Scalar</option>
+        <option value="pref_scalar">Preference Scalar</option>
       </select>
       <label>-</label>
       <select onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}>
@@ -64,10 +71,16 @@ function ListView(props: ListProps) {
           </tr>
         </thead>
         <tbody>
-          {sortedPairingData.map((pairing) => (
+          {sortedPairingData.map((pairing, index) => (
             <tr key={`${pairing.team}-${pairing.project}`}>
               <td>
-                <PairingDiv team={pairing.team} project={pairing.project} />
+                <PairingDiv
+                  team={pairing.team}
+                  project={pairing.project}
+                  key={index}
+                  isShown={expandedIndex.includes(index)}
+                  onToggle={() => handleToggle(index)}
+                />
               </td>
             </tr>
           ))}
