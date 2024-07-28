@@ -1,7 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useCoreService } from "../../CoreServiceContext";
 import { useNavigation } from "../../NavServiceContext";
 import PairingDiv from "../Pairing";
+import "./SpreadsheetView.css"; // Import the CSS file
 
 function SpreadsheetView() {
   const coreService = useCoreService();
@@ -15,7 +16,7 @@ function SpreadsheetView() {
   const [modalTeam, setModalTeam] = useState<number>(0);
   const [modalProject, setModalProject] = useState<number>(0);
 
-  const handelCellClick = (team: number, project: number) => {
+  const handleCellClick = (team: number, project: number) => {
     console.log(team, project, coreService.get_pairing_data(team, project));
     setModalTeam(team);
     setModalProject(project);
@@ -24,29 +25,19 @@ function SpreadsheetView() {
 
   return (
     <div className="relative">
-      <div>
-        <h1>Options for searching somehow i guess</h1>
-        <label>TODO:</label>
-        <ul>
-          <li>view options</li>
-          <li>Hover on row and column</li>
-          <li>colours on cells</li>
-          <li>fix left and top to side and only scroll data cells</li>
-          <li>Navigate to specific row/col/cell</li>
-        </ul>
+      <div className="toolbar-space">
       </div>
-      <div className="relative overflow-auto max-w-full max-h-full">
-        <table className="table-auto border-collapse border border-gray-400 min-w-full">
+      <div className="spreadsheet-container">
+        <table className="spreadsheet-table table-auto border-collapse border border-gray-400 min-w-full">
           <thead>
             <tr>
-              <th className="border border-gray-300 px-4 py-2 sticky top-0 bg-white z-10 left-0">
+              <th className="sticky-header border border-gray-300 px-4 py-2">
                 Team/Project
               </th>
-              {/* Render table header based on number of projects */}
               {Array.from({ length: numProjects || 0 }, (_, projectIndex) => (
                 <th
                   key={projectIndex + 1}
-                  className="border border-gray-300 px-4 py-2 sticky top-0 bg-white"
+                  className="sticky-header border border-gray-300 px-4 py-2"
                 >
                   Project {projectIndex + 1}
                 </th>
@@ -54,10 +45,9 @@ function SpreadsheetView() {
             </tr>
           </thead>
           <tbody>
-            {/* Render table rows and cells based on data */}
             {Array.from({ length: numTeams }, (_, teamIndex) => (
               <tr key={teamIndex + 1}>
-                <td className="border border-gray-300 px-4 py-2 sticky left-0 bg-white z-10">
+                <td className="sticky-cell border border-gray-300 px-4 py-2">
                   Team {teamIndex + 1}
                 </td>
                 {Array.from({ length: numProjects }, (_, projectIndex) => (
@@ -71,7 +61,7 @@ function SpreadsheetView() {
                     }}
                     key={projectIndex + 1}
                     onClick={() =>
-                      handelCellClick(teamIndex + 1, projectIndex + 1)
+                      handleCellClick(teamIndex + 1, projectIndex + 1)
                     }
                   >
                     {coreService.get_b_value(teamIndex + 1, projectIndex + 1)}

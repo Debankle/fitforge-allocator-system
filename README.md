@@ -3,9 +3,11 @@
 ## TODO:
 
 ### Oliver:
-- Implement allocation and rejection logic in CoreService
-- Get Pairing div to reload with b value recalculation
-- Implement save file functionality
+- Google sheets loading on InputComponent
+- clean up code and add comments for clarity
+- Spreadsheet view to be properly anchored and scrollable
+- navigation arrows in navbar to go back and forth with settings somehow?
+
 
 ## Testing Data
 
