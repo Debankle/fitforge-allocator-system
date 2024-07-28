@@ -1,4 +1,5 @@
 import ILPAllocator from "./algorithms/ILP";
+import { runGaleShapley } from "./algorithms/GS";
 import { Setup, State, Pairing } from "./interfaces";
 import StateSaver from "./StateIO";
 
