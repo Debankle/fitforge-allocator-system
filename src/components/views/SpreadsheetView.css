@@ -1,43 +1,71 @@
-/* SpreadsheetView.css */
-
+/* Adjust the space for the toolbar */
 .toolbar-space {
-    margin-bottom: 20px; /* Adjust based on your toolbar height */
-  }
-  
-  .toolbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 10; /* Ensure toolbar is above the spreadsheet */
-    background-color: #008000; /* Ensure toolbar is visible */
-  }
-  
-  .spreadsheet-container {
-    margin-top: 60px; /* Adjust based on your toolbar height */
-    position: relative;
-    z-index: 1; /* Ensure it is below the toolbar */
-    overflow: auto;
-    max-width: 100%;
-    max-height: 100vh; /* Adjust height as needed */
-  }
-  
-  .spreadsheet-table th,
-  .spreadsheet-table td {
-    text-align: left;
-  }
-  
-  .sticky-header {
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 2; /* Ensure header is above the table rows */
-  }
-  
-  .sticky-cell {
-    position: sticky;
-    left: 0;
-    background: white;
-    z-index: 1;
-  }
-  
+  margin-bottom: 60px; /* Adjust based on your toolbar height */
+}
+
+/* Styles for the fixed toolbar */
+.toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10; /* Ensure toolbar is above the spreadsheet */
+  background-color: #008000; /* Toolbar background color */
+}
+
+/* Styles for the fixed navbar */
+.navbar {
+  position: fixed;
+  top: 60px; /* Adjust based on your toolbar height */
+  left: 0;
+  width: 100%;
+  z-index: 9; /* Ensure navbar is below the toolbar but above the spreadsheet */
+  background-color: #333; /* Navbar background color */
+}
+
+/* Container for the spreadsheet */
+.spreadsheet-container {
+  margin-top: -8px; /* Adjust based on the combined height of your toolbar and navbar */
+  position: relative;
+  z-index: 1; /* Ensure it is below the toolbar and navbar */
+  overflow: auto; /* Enable both vertical and horizontal scrolling */
+  max-width: 100%; /* Allow full width */
+  max-height: calc(100vh - 120px); /* Adjust height based on the combined height of toolbar and navbar */
+}
+
+/* Table styles */
+.spreadsheet-table {
+  border-collapse: collapse;
+  width: 100%; /* Ensure the table width fills the container */
+}
+
+.spreadsheet-table th,
+.spreadsheet-table td {
+  text-align: center; /* Center align text */
+  padding: 8px; /* Add padding for better readability */
+  min-width: 100px; /* Ensure each cell has a minimum width */
+  border: 1px solid #ccc; /* Border color */
+}
+
+/* Sticky header for the table */
+.sticky-header {
+  position: sticky;
+  top: -60px; /* Adjust based on the height of your navbar */
+  background: white;
+  z-index: 2; /* Ensure header is above the table rows */
+  padding: 8px; /* Ensure padding matches table cells */
+}
+
+/* Sticky first column cells */
+.sticky-cell {
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 1;
+  padding: 8px; /* Ensure padding matches table cells */
+}
+
+/* Additional styles for sticky cell and header */
+.sticky-cell, .sticky-header {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for better visual separation */
+}
