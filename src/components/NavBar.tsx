@@ -1,56 +1,46 @@
 import { useNavigation } from "../NavServiceContext";
+import "./NavBar.css"; // Import custom CSS for styling
+import { NavPage } from "../interfaces";
+
+type MenuItem = {
+  label: string;
+  page: NavPage;
+  data: any; // Refine if you have specific types for `data`
+};
 
 function NavBar() {
-  const { navigate } = useNavigation();
+  const { navigate, currentPage } = useNavigation();
+
+  const menuItems: MenuItem[] = [
+    { label: "Upload", page: "Upload", data: null },
+    { label: "Algorithm", page: "Algorithm", data: null },
+    { label: "Spreadsheet", page: "Spreadsheet", data: null },
+    { label: "Allocations", page: "Allocations", data: null },
+    { label: "Rejections", page: "Rejections", data: null },
+    { label: "Project List", page: "ProjectList", data: { team: 1 } },
+    { label: "Team List", page: "TeamList", data: { project: 1 } },
+  ];
+
+  const listItemClass = "text-default cursor-pointer hover:text-hovered";
+  const activeItemClass = "bg-blue-500 rounded-full text-white px-4 py-2"; // Circular styling
 
   return (
-    <div className="bg-gray-800 p-4">
-      <ul className="flex space-x-4">
-        <li
-          className="text-white cursor-pointer hover:text-gray-400"
-          onClick={() => navigate({ page: "Upload", data: null })}
-        >
-          Upload
-        </li>
-        <li
-          className="text-white cursor-pointer hover:text-gray-400"
-          onClick={() => navigate({ page: "Algorithm", data: null })}
-        >
-          Algorithm
-        </li>
-        <li
-          className="text-white cursor-pointer hover:text-gray-400"
-          onClick={() => navigate({ page: "Spreadsheet", data: null })}
-        >
-          Spreadsheet
-        </li>
-        <li
-          className="text-white cursor-pointer hover:text-gray-400"
-          onClick={() => navigate({ page: "Allocations", data: null })}
-        >
-          Allocations
-        </li>
-        <li
-          className="text-white cursor-pointer hover:text-gray-400"
-          onClick={() => navigate({ page: "Rejections", data: null })}
-        >
-          Rejections
-        </li>
-        <li
-          className="text-white cursor-pointer hover:text-gray-400"
-          onClick={() => navigate({ page: "ProjectList", data: { team: 1 } })}
-        >
-          Project List
-        </li>
-        <li
-          className="text-white cursor-pointer hover:text-gray-400"
-          onClick={() => navigate({ page: "TeamList", data: { project: 1 } })}
-        >
-          Team List
-        </li>
+    <div className="bg-white p-4">
+      <ul className="flex justify-center items-center space-x-8">
+        {menuItems.map((item) => (
+          <li
+            key={item.label}
+            className={`${listItemClass} ${
+              currentPage.page === item.page ? activeItemClass : ""
+            }`}
+            onClick={() => navigate({ page: item.page, data: item.data })}
+          >
+            {item.label}
+          </li>
+        ))}
       </ul>
     </div>
   );
-};
+}
 
 export default NavBar;

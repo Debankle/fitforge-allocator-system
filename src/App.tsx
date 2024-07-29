@@ -10,6 +10,7 @@ import Rejections from "./components/views/Rejections";
 import ProjectList from "./components/views/ProjectList";
 import TeamList from "./components/views/TeamList";
 import { useNavigation } from "./NavServiceContext";
+import './App.css'; // Import your CSS file
 
 function App() {
   const coreService = useCoreService();
@@ -41,17 +42,17 @@ function App() {
         return <InputComponent />;
     }
   };
+
   return (
-    <>
+    <div className="app-container">
       <div className="sticky top-0">
         <Toolbar />
         <NavBar />
       </div>
-
       <div className="flex justify-center items-center mt-2">
         {renderComponent()}
       </div>
-    </>
+    </div>
   );
 }
 

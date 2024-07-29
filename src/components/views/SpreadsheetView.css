@@ -1,7 +1,6 @@
 /* Adjust the space for the toolbar */
 .toolbar-space {
-  margin-bottom: 60px;
-  /* Adjust based on your toolbar height */
+  margin-bottom: 60px; /* Adjust based on your toolbar height */
 }
 
 /* Styles for the fixed toolbar */
@@ -10,81 +9,56 @@
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 10;
-  /* Ensure toolbar is above the spreadsheet */
-  background-color: #ffffff;
-  /* Toolbar background color */
+  z-index: 10; /* Ensure toolbar is above the spreadsheet */
+  background-color: #ffffff; /* Toolbar background color */
 }
 
 /* Styles for the fixed navbar */
 .navbar {
   position: fixed;
-  top: 60px;
-  /* Adjust based on your toolbar height */
+  top: 60px; /* Adjust based on your toolbar height */
   left: 0;
   width: 100%;
-  z-index: 9;
-  /* Ensure navbar is below the toolbar but above the spreadsheet */
-  background-color: #333;
-  /* Navbar background color */
+  z-index: 9; /* Ensure navbar is below the toolbar but above the spreadsheet */
+  background-color: #333; /* Navbar background color */
 }
 
 /* Container for the spreadsheet */
 .spreadsheet-container {
-  margin-top: -10px;
-  /* Adjust based on the combined height of your toolbar and navbar */
+  margin-top: -13px; /* Adjust based on the combined height of your toolbar and navbar */
   position: relative;
-  z-index: 1;
-  /* Ensure it is below the toolbar and navbar */
-  overflow: auto;
-  /* Enable both vertical and horizontal scrolling */
-  max-width: 100%;
-  /* Allow full width */
-  max-height: calc(100vh - 120px);
-  /* Adjust height based on the combined height of toolbar and navbar */
-  background-color: #f4f4f4;
-  /* Light background color for the container */
+  z-index: 1; /* Ensure it is below the toolbar and navbar */
+  overflow: auto; /* Enable both vertical and horizontal scrolling */
+  max-width: 100%; /* Allow full width */
+  max-height: calc(100vh - 120px); /* Adjust height based on the combined height of toolbar and navbar */
 }
 
 /* Table styles */
 .spreadsheet-table {
   border-collapse: collapse;
-  width: 100%;
-  /* Ensure the table width fills the container */
-  background-color: #fff;
-  /* Table background color */
+  width: 100%; /* Ensure the table width fills the container */
+  background-color: #fff; /* Table background color */
 }
 
 /* Center align text in cells */
 .spreadsheet-table th,
 .spreadsheet-table td {
-  text-align: center;
-  /* Center align text */
-  padding: 10px;
-  /* Add padding for better readability */
-  min-width: 100px;
-  /* Ensure each cell has a minimum width */
-  border: 1px solid #ddd;
-  /* Light border color */
-  transition: background-color 0.3s ease;
-  /* Smooth transition for hover effect */
+  text-align: center; /* Center align text */
+  padding: 8px; /* Add padding for better readability */
+  min-width: 100px; /* Ensure each cell has a minimum width */
+  border: 1px solid #ddd; /* Light border color */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }
 
 /* Sticky header for the table */
 .sticky-header {
   position: sticky;
-  top: 0px;
-  /* Adjust based on the height of your navbar */
-  background: #00796b;
-  /* Header background color */
-  color: white;
-  /* Header text color */
-  z-index: 2;
-  /* Ensure header is above the table rows */
-  padding: 10px;
-  /* Ensure padding matches table cells */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  /* Optional shadow for better visual separation */
+  top: 0px; /* Adjust based on the height of your navbar */
+  background: #00796b; /* Header background color */
+  color: white; /* Header text color */
+  z-index: 2; /* Ensure header is above the table rows */
+  padding: 10px; /* Ensure padding matches table cells */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for better visual separation */
 }
 
 /* Sticky first column cells */
@@ -93,46 +67,38 @@
   left: 0;
   background: white;
   z-index: 1;
-  padding: 8px;
-  /* Ensure padding matches table cells */
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  /* Optional shadow for better visual separation */
+  padding: 8px; /* Ensure padding matches table cells */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional shadow for better visual separation */
 }
 
 /* Ensure the table's first row and column stay fixed */
 .sticky-header th,
 .sticky-cell td {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  /* Optional shadow for better visual separation */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for better visual separation */
 }
 
 /* Additional adjustments to ensure layout consistency */
 .spreadsheet-table td {
-  background: white;
-  /* Ensure cells have a white background for consistency */
+  background: white; /* Ensure cells have a white background for consistency */
 }
 
 /* Cell colors */
 .spreadsheet-table tr:nth-child(even) {
-  background-color: #e0f2f1;
-  /* Light green for even rows */
+  background-color: #e0f2f1; /* Light green for even rows */
 }
 
 .spreadsheet-table tr:nth-child(odd) {
-  background-color: #b2dfdb;
-  /* Slightly darker green for odd rows */
+  background-color: #b2dfdb; /* Slightly darker green for odd rows */
 }
 
 .spreadsheet-table td {
-  background: #ffffff;
-  /* Cell background color */
+  background: #ffffff; /* Cell background color */
 }
 
 
 /* Hover effect for individual cells */
 .spreadsheet-table td:hover {
-  background-color: #004d40;
-  /* Darker green for cell hover */
-  color: white;
-  /* Text color on hover */
+  background-color: #004d40; /* Darker green for cell hover */
+  color: white; /* Text color on hover */
 }
+

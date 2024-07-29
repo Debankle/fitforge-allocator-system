@@ -1,0 +1,15 @@
+/* index.css or App.css */
+
+body {
+    background-color: #cdd1d8; /* Set page background color */
+    margin: 0; /* Remove default margin */
+    font-family: 'Futura', sans-serif; /* Apply Futura font if available */
+  }
+  
+/* App.css */
+
+.app-container {
+    background-color: #cdd1d8; /* Set page background color */
+    min-height: 100vh; /* Ensure it covers the full height */
+  }
+  

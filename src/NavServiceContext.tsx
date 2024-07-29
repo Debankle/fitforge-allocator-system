@@ -15,6 +15,7 @@ export const useNavigation = () => {
   return context;
 };
 
+
 const NavigationProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
@@ -37,5 +38,7 @@ const NavigationProvider: React.FC<{ children: ReactNode }> = ({
     </NavigationContext.Provider>
   );
 };
+
+
 
 export default NavigationProvider;

@@ -1,0 +1,44 @@
+/* SpreadsheetView.css */
+
+.toolbar-space {
+    margin-bottom: 20px; /* Adjust based on your toolbar height */
+  }
+  
+  .toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10; /* Ensure toolbar is above the spreadsheet */
+    background-color: #156ad2; /* Toolbar background color */
+    font-family: 'Futura', sans-serif; /* Apply Futura font */
+  }
+  
+  .spreadsheet-container {
+    margin-top: 60px; /* Adjust based on your toolbar height */
+    position: relative;
+    z-index: 1; /* Ensure it is below the toolbar */
+    overflow: auto;
+    max-width: 100%;
+    max-height: 100vh; /* Adjust height as needed */
+  }
+  
+  .spreadsheet-table th,
+  .spreadsheet-table td {
+    text-align: left;
+  }
+  
+  .sticky-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2; /* Ensure header is above the table rows */
+  }
+  
+  .sticky-cell {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+  }
+  
