@@ -45,6 +45,7 @@ function App() {
 
   return (
     <div className="app-container">
+
       <div className="sticky top-0">
         <Toolbar />
         <NavBar />
@@ -53,6 +54,7 @@ function App() {
         {renderComponent()}
       </div>
     </div>
+
   );
 }
 

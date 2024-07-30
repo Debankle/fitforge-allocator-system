@@ -4,6 +4,7 @@ import { useNavigation } from "../../NavServiceContext";
 import PairingDiv from "../Pairing";
 import "./SpreadsheetView.css"; // Import the CSS file
 
+
 function SpreadsheetView() {
   const coreService = useCoreService();
   const { navigate } = useNavigation();

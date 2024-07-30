@@ -8,6 +8,7 @@ interface Setup {
   num_teams_to_project: number[];
   sheet_tags?: { [key: string]: string };
   multi_team_projects?: { [projectId: string]: boolean };
+
 }
 
 interface SheetTags {

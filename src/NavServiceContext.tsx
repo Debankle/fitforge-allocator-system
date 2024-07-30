@@ -39,6 +39,4 @@ const NavigationProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-
-
 export default NavigationProvider;

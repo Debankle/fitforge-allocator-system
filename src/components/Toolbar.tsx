@@ -5,6 +5,7 @@ function Toolbar() {
   const [fitScale, setFitScale] = useState<number>(1);
   const [prefScale, setPrefScale] = useState<number>(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coreService = useCoreService();
 
