@@ -1,79 +1,85 @@
-import * as xlsx from 'xlsx';
 import { multiply, add } from 'mathjs';
 
 type SheetData = number[][];
 type PreferencesMatrix = number[][];
 interface MatchResults {
-    teamMatches: Record<string, string>;
-    totalScore: number;
+  teamMatches: Record<string, string>;
+  totalScore: number;
 }
 
-// Reads data into 2D Array
-const readSheet = (filePath: string, sheetName: string): SheetData => {
-    const workbook = xlsx.readFile(filePath);
-    const sheet = workbook.Sheets[sheetName];
-    const data = xlsx.utils.sheet_to_json(sheet, { header: 1 }) as (string | number)[][];
+const calculateBValues = (fitValues: SheetData, preferenceValues: SheetData, fitScalar: number = 1, prefScalar: number = 1): SheetData => {
+  const numTeams = fitValues.length;
+  const numProjects = fitValues[0].length;
+  const bValues: SheetData = Array.from({ length: numTeams }, () => Array(numProjects).fill(0));
 
-    // Remove the header row and convert the data to numbers
-    return data.slice(1).map(row => row.slice(1).map(cell => Number(cell)));
-};
+  let max = -Infinity;
+  let min = Infinity;
 
-// Read Excel Sheets (placeholders) ------- still just takes in 3
-const df: SheetData = readSheet("Book1.xlsx", "Sheet1");
-const db: SheetData = readSheet("Book1.xlsx", "Sheet2");
-const dg: SheetData = readSheet("Book1.xlsx", "Sheet3");
-
-// Merge the three sheets into one data sheet - asumming third sheet is 1 and 0's for if they are compatible at all
-const mergePreferences = (df: SheetData, db: SheetData, dg: SheetData): PreferencesMatrix => {
-    const combinedPreferences = add(df, db);
-    return multiply(combinedPreferences, dg) as PreferencesMatrix;
-};
-
-// Main allocation algorithm
-const algo = (df: SheetData, db: SheetData, dg: SheetData): MatchResults => {
-    const combinedPreferences = mergePreferences(df, db, dg);
-    const teamMatches: Record<string, string> = {};
-    const projectMatches: Record<string, string> = {};
-    const allocatedProjects = new Set<string>();
-
-
-    const freeTeams = [...Array(df.length).keys()]; 
-
-    //Iterates over teams
-    while (freeTeams.length > 0) {
-        const teamIndex = freeTeams.shift()!;
-        const preferences = combinedPreferences[teamIndex]
-            .map((score, index) => ({ score, index })) 
-            .filter(item => item.score > 0)
-            .sort((a, b) => b.score - a.score);
-
-        // Gale
-        for (const { index: projectIndex } of preferences) {
-            if (!allocatedProjects.has(projectIndex.toString())) {
-                teamMatches[teamIndex.toString()] = projectIndex.toString();
-                projectMatches[projectIndex.toString()] = teamIndex.toString();
-                allocatedProjects.add(projectIndex.toString());
-                break;
-            } else {
-                const currentTeamIndex = parseInt(projectMatches[projectIndex.toString()]);
-                const currentRank = combinedPreferences[currentTeamIndex][projectIndex];
-                const newRank = combinedPreferences[teamIndex][projectIndex];
-                if (newRank > currentRank) {
-                    delete teamMatches[currentTeamIndex.toString()];
-                    teamMatches[teamIndex.toString()] = projectIndex.toString();
-                    projectMatches[projectIndex.toString()] = teamIndex.toString();
-                    freeTeams.push(currentTeamIndex);
-                    break;
-                }
-            }
-        }
+  for (let i = 0; i < numTeams; i++) {
+    for (let j = 0; j < numProjects; j++) {
+      const bValue = fitScalar * fitValues[i][j] + prefScalar * preferenceValues[i][j];
+      bValues[i][j] = bValue;
+      if (bValue > max) max = bValue;
+      if (bValue < min) min = bValue;
     }
+  }
 
-    const totalScore = Object.entries(teamMatches).reduce((sum, [team, project]) => {
-        return sum + combinedPreferences[parseInt(team)][parseInt(project)];
-    }, 0);
-
-    return { teamMatches, totalScore };
+  const range = max - min;
+  if (range > 0) {
+    for (let i = 0; i < numTeams; i++) {
+      for (let j = 0; j < numProjects; j++) {
+        bValues[i][j] = (bValues[i][j] - min) / range;
+      }
+    }
+  }
+  return bValues;
 };
 
-const { teamMatches, totalScore } = algo(df, db, dg);
+export const runGaleShapley = (fitValues: SheetData, preferenceValues: SheetData, fitScalar: number = 1, prefScalar: number = 1): number[][] => {
+  // Calculate b_values
+  const bValues = calculateBValues(fitValues, preferenceValues, fitScalar, prefScalar);
+
+  const numTeams = fitValues.length;
+  const numProjects = fitValues[0].length;
+  const allocation_set: number[][] = Array.from({ length: numTeams }, () => []);
+
+  const teamMatches: Record<string, string> = {};
+  const projectMatches: Record<string, string> = {};
+  const allocatedProjects = new Set<string>();
+
+  const freeTeams = [...Array(numTeams).keys()].map(i => i + 1); // Adjusted to start from 1
+
+  while (freeTeams.length > 0) {
+    const teamIndex = freeTeams.shift()! - 1; // Adjusted for zero-based indexing
+    const preferences = bValues[teamIndex]
+      .map((score, index) => ({ score, index }))
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score);
+
+    for (const { index: projectIndex } of preferences) {
+      if (!allocatedProjects.has((projectIndex + 1).toString())) { // Adjusted to start from 1
+        teamMatches[(teamIndex + 1).toString()] = (projectIndex + 1).toString(); // Adjusted to start from 1
+        projectMatches[(projectIndex + 1).toString()] = (teamIndex + 1).toString(); // Adjusted to start from 1
+        allocatedProjects.add((projectIndex + 1).toString()); // Adjusted to start from 1
+        allocation_set[teamIndex].push(projectIndex + 1); // Adjusted to start from 1
+        break;
+      } else {
+        const currentTeamIndex = parseInt(projectMatches[(projectIndex + 1).toString()]) - 1; // Adjusted for zero-based indexing
+        const currentRank = bValues[currentTeamIndex][projectIndex];
+        const newRank = bValues[teamIndex][projectIndex];
+        if (newRank > currentRank) {
+          delete teamMatches[(currentTeamIndex + 1).toString()]; // Adjusted to start from 1
+          teamMatches[(teamIndex + 1).toString()] = (projectIndex + 1).toString(); // Adjusted to start from 1
+          projectMatches[(projectIndex + 1).toString()] = (teamIndex + 1).toString(); // Adjusted to start from 1
+          allocation_set[currentTeamIndex] = allocation_set[currentTeamIndex].filter(proj => proj !== (projectIndex + 1)); // Adjusted to start from 1
+          allocation_set[teamIndex].push(projectIndex + 1); // Adjusted to start from 1
+          freeTeams.push(currentTeamIndex + 1); // Adjusted to start from 1
+          break;
+        }
+      }
+    }
+  }
+
+  return allocation_set;
+};
+

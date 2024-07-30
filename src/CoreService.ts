@@ -1,6 +1,7 @@
 import ILPAllocator from "./algorithms/ILP";
 import { Setup, State, Pairing, AllocationSet } from "./interfaces";
 import StateSaver from "./StateIO";
+import { runGaleShapley } from "./algorithms/GS"; // Import the Gale-Shapley function
 
 class CoreService {
   private fit_values: number[][] = [[]];
@@ -243,8 +244,37 @@ class CoreService {
         console.error("Failed to find a valid allocation");
       }
     } else if (algorithm == "GS") {
+      // Call the Gale-Shapley algorithm
+      const allocation_set = runGaleShapley(this.fit_values, this.preference_values, this.fit_scalar, this.preference_scalar);
+
+      // Format allocation_set to match the AllocationSet type
+      const allocations: number[][] = [];
+      for (let i = 0; i < allocation_set.length; i++) {
+        for (const proj of allocation_set[i]) {
+          allocations.push([i + 1, proj]); // +1 to match 1-based index
+        }
+      }
+
+      const allocation: AllocationSet = {
+        allocation: allocations,
+        score: this.calculateScoreFromAllocation(allocation_set),
+        algorithm: "GS",
+        runCount: this.allocation_sets.length + 1,
+      };
+      this.allocation_sets.push(allocation);
+      return true;
     }
     return false;
+  }
+
+  private calculateScoreFromAllocation(allocation_set: number[][]): number {
+    let score = 0;
+    for (let teamIndex = 0; teamIndex < allocation_set.length; teamIndex++) {
+      for (const projectIndex of allocation_set[teamIndex]) {
+        score += this.b_values[teamIndex][projectIndex];
+      }
+    }
+    return score;
   }
 
   get_pairing_data(team: number, project: number): Pairing {
@@ -350,3 +380,5 @@ class CoreService {
 }
 
 export default CoreService;
+
+
