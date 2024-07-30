@@ -1,16 +1,20 @@
+import React, { useEffect, useState } from "react";
+import Pagination from "./PageNav";
 import { useCoreService } from "../../CoreServiceContext";
-import { useEffect, useState } from "react";
-import ListView from "./ListView";
+
 interface Props {
   project: number;
+  team: number;
 }
 
-function TeamList(props: Props) {
+const TeamList: React.FC<Props> = (props) => {
   const coreService = useCoreService();
   const [project, setProject] = useState<number>(props.project);
   const [pairings, setPairings] = useState<number[][]>([]);
+
   const numTeams = coreService.get_num_teams();
   const numProjects = coreService.get_num_projects();
+  const itemsPerPage = 12;
 
   useEffect(() => {
     const newPairings: number[][] = [];
@@ -18,7 +22,7 @@ function TeamList(props: Props) {
       newPairings.push([i, project]);
     }
     setPairings(newPairings);
-  }, [project]);
+  }, [project, numTeams]);
 
   const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setProject(parseInt(event.target.value));
@@ -26,7 +30,7 @@ function TeamList(props: Props) {
 
   return (
     <div>
-      <label htmlFor="project-select">Team:</label>
+      <label htmlFor="project-select">Project:</label>
       <select
         id="project-select"
         value={project}
@@ -39,10 +43,13 @@ function TeamList(props: Props) {
         ))}
       </select>
 
-
-      <ListView title={"Pairings for project " + project} pairings={pairings} />
+      <Pagination
+        title={`Pairings for project ${project}`}
+        pairings={pairings}
+        itemsPerPage={itemsPerPage}
+      />
     </div>
   );
-}
+};
 
 export default TeamList;
