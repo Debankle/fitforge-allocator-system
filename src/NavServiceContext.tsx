@@ -15,6 +15,7 @@ export const useNavigation = () => {
   return context;
 };
 
+
 const NavigationProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {

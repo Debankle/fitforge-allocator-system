@@ -7,7 +7,8 @@ interface Setup {
   pref_vals: number[][];
   num_teams_to_project: number[];
   sheet_tags?: { [key: string]: string };
-  multi_team_projects?: { [projectId: string]: boolean }; // Updated to use project IDs
+  multi_team_projects?: { [projectId: string]: boolean };
+
 }
 
 interface SheetTags {
@@ -16,16 +17,10 @@ interface SheetTags {
 
 function InputComponent() {
   const [files, setFiles] = useState<File[]>([]);
-  const [sheetNames, setSheetNames] = useState<{
-    [fileName: string]: string[];
-  }>({});
-  const [sheetTags, setSheetTags] = useState<{ [fileName: string]: SheetTags }>(
-    {}
-  );
+  const [sheetNames, setSheetNames] = useState<{ [fileName: string]: string[] }>({});
+  const [sheetTags, setSheetTags] = useState<{ [fileName: string]: SheetTags }>({});
   const [projectOptions, setProjectOptions] = useState<string[]>([]);
-  const [multiTeamProjects, setMultiTeamProjects] = useState<{
-    [projectId: string]: boolean;
-  }>({});
+  const [multiTeamProjects, setMultiTeamProjects] = useState<{ [projectId: string]: boolean }>({});
   const [processing, setProcessing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const coreService = useCoreService();
@@ -83,21 +78,14 @@ function InputComponent() {
     }
   };
 
-  const handleTagChange = (
-    fileName: string,
-    sheetName: string,
-    tag: string
-  ) => {
+  const handleTagChange = (fileName: string, sheetName: string, tag: string) => {
     setSheetTags({
       ...sheetTags,
       [fileName]: { ...sheetTags[fileName], [sheetName]: tag },
     });
   };
 
-  const handleMultiTeamChange = (
-    projectId: string,
-    canTakeMultipleTeams: boolean
-  ) => {
+  const handleMultiTeamChange = (projectId: string, canTakeMultipleTeams: boolean) => {
     setMultiTeamProjects({
       ...multiTeamProjects,
       [projectId]: canTakeMultipleTeams,
@@ -106,7 +94,6 @@ function InputComponent() {
 
   const extractProjectsFromSheet = (data: number[][]): string[] => {
     if (data.length > 0) {
-      // Assume first row is headers with project names
       return data[0].map((_, index) => `Project ${index + 1}`);
     }
     return [];
@@ -155,7 +142,7 @@ function InputComponent() {
             pref_vals: pref,
             num_teams_to_project: n,
             sheet_tags: Object.assign({}, ...Object.values(sheetTags)),
-            multi_team_projects: multiTeamProjects, // Include this in setupParams
+            multi_team_projects: multiTeamProjects,
           };
 
           coreService.initialise_values(setupParams);
@@ -171,17 +158,13 @@ function InputComponent() {
     }
   };
 
-  const readFromExcelSheet = (
-    sheet: File,
-    sheetName: string,
-    tag: string
-  ): Promise<{ data: number[][]; tag: string }> => {
+  const readFromExcelSheet = (sheet: File, sheetName: string, tag: string): Promise<{ data: number[][]; tag: string }> => {
     return new Promise((resolve, reject) => {
       readXlsxFile(sheet, { sheet: sheetName })
         .then((rows) => {
           const dataArray: number[][] = [];
           for (let i = 1; i < rows.length; i++) {
-            dataArray[i-1] = [];
+            dataArray[i - 1] = [];
             for (let j = 1; j < rows[0].length; j++) {
               const cellValue = rows[i][j];
               if (typeof cellValue === "number") {
@@ -199,105 +182,94 @@ function InputComponent() {
   };
 
   return (
-    <div className="bg-green-200 m-5 p-5">
-      <input
-        type="file"
-        id="input"
-        multiple
-        onChange={handleFileChange}
-        className="m-2"
-        disabled={processing}
-      />
-
-      {Object.keys(sheetNames).length > 0 && (
-        <div style={{ marginTop: "20px" }}>
-          <h3 style={{ marginBottom: "10px", fontSize: "24px" }}>
-            Please select the sheet containing the Fit Data and the sheet
-            containing the Preference Data:
-          </h3>
-          {Object.entries(sheetNames).map(([fileName, names]) => (
-            <div key={fileName}>
-              <h4>{fileName}</h4>
-              <ul>
-                {names.map((name, index) => (
-                  <li
-                    key={index}
-                    style={{ marginBottom: "10px", fontSize: "18px" }}
-                  >
-                    {name}
-                    <div>
-                      <select
-                        value={sheetTags[fileName][name]}
-                        onChange={(e) =>
-                          handleTagChange(fileName, name, e.target.value)
-                        }
-                        style={{ marginLeft: "10px" }}
-                        disabled={processing}
-                      >
-                        <option value="">Select Tag</option>
-                        <option value="Fit">Fit</option>
-                        <option value="Pref">Pref</option>
-                      </select>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+    <div className="bg-[#cdd1d8] min-h-screen flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full">
+        <div className="flex flex-col items-center mb-4">
+          <input
+            type="file"
+            id="input"
+            multiple
+            onChange={handleFileChange}
+            className="mb-4 border border-gray-300 rounded-md p-2 w-full"
+            disabled={processing}
+          />
         </div>
-      )}
 
-      {projectOptions.length > 0 && (
-        <div style={{ marginTop: "20px" }}>
-          <h3 style={{ marginBottom: "10px", fontSize: "24px" }}>
-            Select the projects that can handle multiple teams:
-          </h3>
-          <ul>
-            {projectOptions.map((project, index) => (
-              <li
-                key={index}
-                style={{ marginBottom: "10px", fontSize: "18px" }}
-              >
-                {project}
-                <input
-                  type="checkbox"
-                  checked={multiTeamProjects[project] || false}
-                  onChange={(e) =>
-                    handleMultiTeamChange(project, e.target.checked)
-                  }
-                  style={{ marginLeft: "10px" }}
-                  disabled={processing}
-                />
-                <label style={{ marginLeft: "5px" }}>
-                  Can Take Multiple Teams
-                </label>
-              </li>
+        {Object.keys(sheetNames).length > 0 && (
+          <div className="mb-4">
+            <h3 className="mb-4 text-xl font-semibold text-gray-800">
+              Please select the sheet containing the Fit Data and the sheet containing the Preference Data:
+            </h3>
+            {Object.entries(sheetNames).map(([fileName, names]) => (
+              <div key={fileName} className="mb-4">
+                <h4 className="text-lg font-semibold text-gray-700">{fileName}</h4>
+                <ul>
+                  {names.map((name, index) => (
+                    <li key={index} className="mb-2 text-md text-gray-600">
+                      {name}
+                      <div className="inline-block ml-2">
+                        <select
+                          value={sheetTags[fileName][name]}
+                          onChange={(e) => handleTagChange(fileName, name, e.target.value)}
+                          className="ml-2 p-2 border border-gray-300 rounded-md"
+                          disabled={processing}
+                        >
+                          <option value="">Select Tag</option>
+                          <option value="Fit">Fit</option>
+                          <option value="Pref">Pref</option>
+                        </select>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
+        )}
+
+        {projectOptions.length > 0 && (
+          <div className="mb-4">
+            <h3 className="mb-4 text-xl font-semibold text-gray-800">
+              Select the projects that can handle multiple teams:
+            </h3>
+            <ul>
+              {projectOptions.map((project, index) => (
+                <li key={index} className="mb-2 text-md text-gray-600">
+                  {project}
+                  <input
+                    type="checkbox"
+                    checked={multiTeamProjects[project] || false}
+                    onChange={(e) => handleMultiTeamChange(project, e.target.checked)}
+                    className="ml-2"
+                    disabled={processing}
+                  />
+                  <label className="ml-2">Can Take Multiple Teams</label>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="flex justify-center space-x-4 mt-4">
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300"
+            onClick={loadSheetNames}
+            disabled={processing || files.length === 0}
+          >
+            {processing ? "Loading..." : "Load Sheets"}
+          </button>
+
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300"
+            onClick={loadData}
+            disabled={processing || files.length === 0 || Object.keys(sheetNames).length === 0}
+          >
+            {processing ? "Processing..." : "Process Data"}
+          </button>
         </div>
-      )}
 
-      <button
-        className="bg-blue-200 m-5 px-4 py-2 rounded-md"
-        onClick={loadSheetNames}
-        disabled={processing || files.length === 0}
-      >
-        {processing ? "Loading..." : "Load Sheets"}
-      </button>
-
-      <button
-        className="bg-blue-200 m-5 px-4 py-2 rounded-md"
-        onClick={loadData}
-        disabled={
-          processing ||
-          files.length === 0 ||
-          Object.keys(sheetNames).length === 0
-        }
-      >
-        {processing ? "Processing..." : "Process Data"}
-      </button>
-
-      {loadError && <p style={{ color: "red" }}>{loadError}</p>}
+        {loadError && <p className="text-red-600 mt-4 text-center">{loadError}</p>}
+      </div>
     </div>
   );
 }

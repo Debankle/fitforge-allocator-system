@@ -4,6 +4,8 @@ import { useCoreService } from "../CoreServiceContext";
 function Toolbar() {
   const [fitScale, setFitScale] = useState<number>(1);
   const [prefScale, setPrefScale] = useState<number>(1);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coreService = useCoreService();
 
@@ -43,80 +45,90 @@ function Toolbar() {
     coreService.saveState("saveState.ffas");
   };
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
   return (
-    <div className="bg-green-300 p-4 flex justify-between items-center">
+    <div className="bg-[#156ad2] p-4 flex justify-center items-center space-x-4 font-bold">
       <input
         type="file"
         ref={fileInputRef}
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
-      <div className="flex space-x-4">
+      <div className="relative">
         <button
-          className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-          onClick={handleSaveBtn}
+          className="bg-white text-[#156ad2] px-4 py-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onClick={toggleDropdown}
         >
-          Save
+          Save/Load
         </button>
-        <button
-          className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-          onClick={handleLoadBtn}
-        >
-          Load
-        </button>
-        <label className="text-white" htmlFor="input1">
-          Fit Scale:
-        </label>
-        <input
-          id="input1"
-          type="number"
-          value={fitScale}
-          onChange={handleFitScaleChange}
-          min="0"
-          step="0.001"
-          className="px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        ></input>
-
-        <label className="text-white" htmlFor="input2">
-          Preference Scale:
-        </label>
-        <input
-          id="input2"
-          type="number"
-          value={prefScale}
-          onChange={handlePrefScaleChange}
-          min="0"
-          step="0.001"
-          className="px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        ></input>
-
-        <button
-          className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-          onClick={() => {
-            coreService.log_dump();
-          }}
-        >
-          Dump CoreService
-        </button>
-
-        <button
-          className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-          onClick={() => {
-            coreService.soft_reset();
-          }}
-        >
-          Reset Data
-        </button>
-
-        <button
-          className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700"
-          onClick={() => {
-            coreService.hard_reset();
-          }}
-        >
-          Clear All
-        </button>
+        {isDropdownOpen && (
+          <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+            <button
+              className="block px-4 py-2 text-[#156ad2] hover:bg-gray-100 w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={handleSaveBtn}
+            >
+              Save
+            </button>
+            <button
+              className="block px-4 py-2 text-[#156ad2] hover:bg-gray-100 w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={handleLoadBtn}
+            >
+              Load
+            </button>
+          </div>
+        )}
       </div>
+      <label className="text-white font-bold" htmlFor="input1">
+        Fit Scale:
+      </label>
+      <input
+        id="input1"
+        type="number"
+        value={fitScale}
+        onChange={handleFitScaleChange}
+        min="0"
+        step="0.001"
+        className="px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+      />
+      <label className="text-white font-bold" htmlFor="input2">
+        Preference Scale:
+      </label>
+      <input
+        id="input2"
+        type="number"
+        value={prefScale}
+        onChange={handlePrefScaleChange}
+        min="0"
+        step="0.001"
+        className="px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+      />
+      <button
+        className="bg-white text-[#156ad2] px-4 py-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onClick={() => {
+          coreService.log_dump();
+        }}
+      >
+        Dump CoreService
+      </button>
+      <button
+        className="bg-white text-[#156ad2] px-4 py-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onClick={() => {
+          coreService.soft_reset();
+        }}
+      >
+        Reset Data
+      </button>
+      <button
+        className="bg-white text-[#156ad2] px-4 py-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onClick={() => {
+          coreService.hard_reset();
+        }}
+      >
+        Clear All
+      </button>
     </div>
   );
 }
