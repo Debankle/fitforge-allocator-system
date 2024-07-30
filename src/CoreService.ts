@@ -1,4 +1,3 @@
-import ILPAllocator from "./algorithms/ILP";
 import { runGaleShapley } from "./algorithms/GS";
 import { Setup, State, Pairing } from "./interfaces";
 import StateSaver from "./StateIO";
@@ -109,14 +108,12 @@ class CoreService {
 
   run_algorithm(algorithm: string): number[][] {
     let allocation_set: number[][] = [];
-    if (algorithm == "ILP") {
-      const alloc_set = ILPAllocator(
-        this.b_values,
-        this.allocations,
-        this.rejections,
-        this.num_teams_to_project
+    if (algorithm == "GS") {
+      allocation_set = runGaleShapley(
+        this.fit_values,
+        this.preference_values,
       );
-      console.log(alloc_set);
+      console.log(allocation_set);
     }
     return allocation_set;
   }
