@@ -13,6 +13,7 @@ function ListView(props: ListProps) {
   const [pairingData, setPairingData] = useState<Pairing[]>([]);
   const [sortProperty, setSortProperty] = useState<keyof Pairing>("team");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,6 +37,12 @@ function ListView(props: ListProps) {
     return 0;
   });
 
+  const handleToggle = (index: number) => {
+    setExpandedIndex((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
+
   return (
     <div>
       <label>Sort by:</label>
@@ -45,11 +52,11 @@ function ListView(props: ListProps) {
       >
         <option value="fit_value">Fit Value</option>
         <option value="pref_value">Preference Value</option>
-        <option value="fit_scalar">Fit Scalar</option>
-        <option value="pref_scalar">Preference Scalar</option>
         <option value="b_value">B Value</option>
         <option value="team">Team</option>
         <option value="project">Project</option>
+        <option value="fit_scalar">Fit Scalar</option>
+        <option value="pref_scalar">Preference Scalar</option>
       </select>
       <label>-</label>
       <select onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}>
@@ -57,22 +64,22 @@ function ListView(props: ListProps) {
         <option value="desc">Descending</option>
       </select>
 
-      <table className="table-auto">
-        <thead>
-          <tr>
-            <th className="px-4 py-2">{props.title}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedPairingData.map((pairing) => (
-            <tr key={`${pairing.team}-${pairing.project}`}>
-              <td>
-                <PairingDiv team={pairing.team} project={pairing.project} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {sortedPairingData.map((pairing, index) => (
+          <div
+            key={`${pairing.team}-${pairing.project}`}
+            className={`bg-white p-4 border rounded shadow ${expandedIndex.includes(index) ? "expanded" : ""}`}
+            onClick={() => handleToggle(index)}
+          >
+            <PairingDiv
+              team={pairing.team}
+              project={pairing.project}
+              isShown={expandedIndex.includes(index)}
+              onToggle={() => handleToggle(index)}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
