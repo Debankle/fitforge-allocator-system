@@ -23,6 +23,7 @@ function PairingDiv(props: Props) {
   const [pairingData, setPairingData] = useState<Pairing>(
     coreService.get_pairing_data(props.team, props.project)
   );
+  const [mode, setMode] = useState<"Read" | "Edit">("Read");
   const bgColor: string = coreService.get_bg_color(pairingData.b_value);
   const allocatedCheckmark = useId();
   const rejectedCheckmark = useId();
@@ -97,14 +98,22 @@ function PairingDiv(props: Props) {
   };
 
   const handleBackgroundClick = (_: React.MouseEvent<HTMLDivElement>) => {
-      props.onToggle();    
+    props.onToggle();
   };
 
   var styleSheet: any;
   if (hover) {
-    styleSheet = { backgroundColor: "rgba(" + bgColor + "0.5)", display: 'inline-block', transition:'all 0.3s' };
+    styleSheet = {
+      backgroundColor: "rgba(" + bgColor + "0.5)",
+      display: "inline-block",
+      transition: "all 0.3s",
+    };
   } else {
-    styleSheet = { backgroundColor: "rgba(" + bgColor + "1)", display: 'inline-block', transition: 'all 0.3s' };
+    styleSheet = {
+      backgroundColor: "rgba(" + bgColor + "1)",
+      display: "inline-block",
+      transition: "all 0.3s",
+    };
   }
 
   return (
@@ -123,25 +132,44 @@ function PairingDiv(props: Props) {
 
         <div className="flex-1 flex flex-col items-center">
           <div className="grid grid-cols-2 gap-4 w-full text-center">
-            <div>
+            <div className="px-2">
               <div className="font-bold">Fit Value:</div>
               <div>
-                {pairingData.fit_value == -1 ? "-" : pairingData.fit_value}
+                {mode == "Read" ? (
+                  pairingData.fit_value == -1 ? (
+                    "-"
+                  ) : (
+                    pairingData.fit_value
+                  )
+                ) : (
+                  <input
+                    className="w-16 p-1 border border-gray-300 rounded"
+                    type="number"
+                    value={pairingData.fit_value}
+                    onChange={(e) =>
+                      coreService.set_fit_value(
+                        pairingData.team,
+                        pairingData.project,
+                        parseInt(e.target.value)
+                      )
+                    }
+                  />
+                )}
               </div>
             </div>
-            <div>
+            <div className="px-2">
               <div className="font-bold">Fit Scalar:</div>
               <div>
                 {pairingData.fit_scalar == -1 ? "-" : pairingData.fit_scalar}
               </div>
             </div>
-            <div>
+            <div className="px-2">
               <div className="font-bold">Pref Value:</div>
               <div>
                 {pairingData.pref_value == -1 ? "-" : pairingData.pref_value}
               </div>
             </div>
-            <div>
+            <div className="px-2">
               <div className="font-bold">Pref Scalar:</div>
               <div>
                 {pairingData.pref_scalar == -1 ? "-" : pairingData.pref_scalar}
@@ -189,7 +217,7 @@ function PairingDiv(props: Props) {
 
         {/*props.isShown will hide this and allow for toggles, but it seems to look better without, idk im not the UI guy */}
         {isShown && (
-          <div className="flex-1 flex flex-col justify-center items-end text-right ml-2 mr-2">
+          <div className="flex-1 flex flex-col justify-center items-end text-right mx-3">
             <button
               className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700 mt-1 mb-1"
               onClick={(e) => {
@@ -216,6 +244,13 @@ function PairingDiv(props: Props) {
               }}
             >
               Project {props.project} team list
+            </button>
+
+            <button
+              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700 mt-1 mb-1"
+              onClick={() => setMode(mode === "Edit" ? "Read" : "Edit")}
+            >
+              {mode === "Edit" ? "Switch to Read" : "Switch to Edit"}
             </button>
           </div>
         )}

@@ -3,26 +3,19 @@ import { Setup, State, Pairing, AllocationSet } from "./interfaces";
 import StateSaver from "./StateIO";
 
 class CoreService {
-  private initial_fit_values: number[][] = [[]];
-  private initial_preference_values: number[][] = [[]];
-
   private fit_values: number[][] = [[]];
   private preference_values: number[][] = [[]];
-  private b_values: number[][] = [[]];
-
   private fit_scalar: number = 1;
   private preference_scalar: number = 1;
-
+  private b_values: number[][] = [[]];
   private num_teams_to_project: number[] = [];
   private allocations: number[][] = [];
   private rejections: number[][] = [];
   private allocation_sets: AllocationSet[] = [];
-
   private num_teams: number = 0;
   private num_projects: number = 0;
   private min: number = Infinity;
   private max: number = -Infinity;
-
   public isDataLoaded: boolean = false;
   private listeners: Set<() => void> = new Set();
 
@@ -77,8 +70,8 @@ class CoreService {
 
   hard_reset(): void {
     this.b_values = [[]];
-    this.initial_preference_values = [[]];
-    this.initial_fit_values = [[]];
+    this.preference_values = [[]];
+    this.fit_values = [[]];
     this.num_teams_to_project = [];
     this.num_teams = 0;
     this.num_projects = 0;
@@ -89,8 +82,6 @@ class CoreService {
   }
 
   soft_reset(): void {
-    this.fit_values = this.initial_fit_values;
-    this.preference_values = this.initial_preference_values;
     this.fit_scalar = 1;
     this.preference_scalar = 1;
     this.allocation_sets = [];
@@ -119,7 +110,9 @@ class CoreService {
     return this.b_values[team - 1][project - 1];
   }
 
-  // Setters for editing values
+  get_b_values(): number[][] {
+    return this.b_values;
+  }
 
   initialise_values(props: Setup): void {
     this.fit_values = props.fit_vals;
@@ -357,6 +350,16 @@ class CoreService {
       }
     }
     return score;
+  }
+
+  set_fit_value(team: number, project: number, fit: number): void {
+    this.fit_values[team - 1][project - 1] = fit;
+    this.calculate_b_values();
+  }
+
+  set_preference_value(team: number, project: number, pref: number): void {
+    this.preference_values[team - 1][project - 1] = pref;
+    this.calculate_b_values();
   }
 }
 

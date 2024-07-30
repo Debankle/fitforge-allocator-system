@@ -10,8 +10,18 @@ function Toolbar() {
   const coreService = useCoreService();
 
   useEffect(() => {
-    setFitScale(coreService.get_fit_scalar());
-    setPrefScale(coreService.get_pref_scalar());
+    const updateData = () => {
+      setFitScale(coreService.get_fit_scalar());
+      setPrefScale(coreService.get_pref_scalar());
+    };
+
+    updateData();
+
+    const listener = () => updateData();
+    coreService.addListener(listener);
+    return () => {
+      coreService.removeListener(listener);
+    };
   }, [coreService]);
 
   const handleFitScaleChange = (e: ChangeEvent<HTMLInputElement>) => {
