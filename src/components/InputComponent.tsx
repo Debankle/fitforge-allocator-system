@@ -146,7 +146,7 @@ function InputComponent() {
           };
 
           coreService.initialise_values(setupParams);
-          coreService.run_algorithm("ILP");
+          coreService.run_algorithm("GS");
         })
         .catch((error) => {
           console.error("Error processing data:", error);
