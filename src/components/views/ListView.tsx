@@ -14,7 +14,6 @@ function ListView(props: ListProps) {
   const [sortProperty, setSortProperty] = useState<keyof Pairing>("team");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
-  const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,12 +36,6 @@ function ListView(props: ListProps) {
     if (compareA > compareB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
-
-  const handleToggle = (index: number) => {
-    setExpandedIndex((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-    );
-  };
 
   const handleToggle = (index: number) => {
     setExpandedIndex((prev) =>
