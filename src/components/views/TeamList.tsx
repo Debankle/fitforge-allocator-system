@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Pagination from "./PageNav";
+import PageNav from "./PageNav";
 import { useCoreService } from "../../CoreServiceContext";
 
 interface Props {
@@ -43,7 +43,7 @@ const TeamList: React.FC<Props> = (props) => {
         ))}
       </select>
 
-      <Pagination
+      <PageNav
         title={`Pairings for project ${project}`}
         pairings={pairings}
         itemsPerPage={itemsPerPage}
