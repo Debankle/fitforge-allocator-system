@@ -64,7 +64,7 @@ function SpreadsheetView() {
                 <td
                   key={`${teamIndex + 1}-${projectIndex + 1}`}
                   style={{
-                    backgroundColor: coreService.get_cell_color(
+                    backgroundColor: coreService.get_cell_bg_colour(
                       teamIndex + 1,
                       projectIndex + 1
                     ),

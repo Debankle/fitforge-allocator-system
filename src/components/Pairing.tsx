@@ -24,7 +24,6 @@ function PairingDiv(props: Props) {
     coreService.get_pairing_data(props.team, props.project)
   );
   const [mode, setMode] = useState<"Read" | "Edit">("Read");
-  const bgColor: string = coreService.get_bg_color(pairingData.b_value);
   const allocatedCheckmark = useId();
   const rejectedCheckmark = useId();
   const isShown = true;
@@ -104,13 +103,13 @@ function PairingDiv(props: Props) {
   var styleSheet: any;
   if (hover) {
     styleSheet = {
-      backgroundColor: "rgba(" + bgColor + "0.5)",
+      backgroundColor: coreService.get_bg_colour(pairingData.b_value, 0.5),
       display: "inline-block",
       transition: "all 0.3s",
     };
   } else {
     styleSheet = {
-      backgroundColor: "rgba(" + bgColor + "1)",
+      backgroundColor: coreService.get_bg_colour(pairingData.b_value, 0.9),
       display: "inline-block",
       transition: "all 0.3s",
     };
@@ -136,18 +135,18 @@ function PairingDiv(props: Props) {
               <div className="font-bold">Fit Value:</div>
               <div>
                 {mode == "Read" ? (
-                  pairingData.fit_value == -1 ? (
+                  pairingData.capability == -1 ? (
                     "-"
                   ) : (
-                    pairingData.fit_value
+                    pairingData.capability
                   )
                 ) : (
                   <input
                     className="w-16 p-1 border border-gray-300 rounded"
                     type="number"
-                    value={pairingData.fit_value}
+                    value={pairingData.capability}
                     onChange={(e) =>
-                      coreService.set_fit_value(
+                      coreService.set_capability_value(
                         pairingData.team,
                         pairingData.project,
                         parseInt(e.target.value)
@@ -160,19 +159,23 @@ function PairingDiv(props: Props) {
             <div className="px-2">
               <div className="font-bold">Fit Scalar:</div>
               <div>
-                {pairingData.fit_scalar == -1 ? "-" : pairingData.fit_scalar}
+                {pairingData.capability_scalar == -1
+                  ? "-"
+                  : pairingData.capability_scalar}
               </div>
             </div>
             <div className="px-2">
               <div className="font-bold">Pref Value:</div>
               <div>
-                {pairingData.pref_value == -1 ? "-" : pairingData.pref_value}
+                {pairingData.preference == -1 ? "-" : pairingData.preference}
               </div>
             </div>
             <div className="px-2">
               <div className="font-bold">Pref Scalar:</div>
               <div>
-                {pairingData.pref_scalar == -1 ? "-" : pairingData.pref_scalar}
+                {pairingData.preference_scalar == -1
+                  ? "-"
+                  : pairingData.preference_scalar}
               </div>
             </div>
           </div>
