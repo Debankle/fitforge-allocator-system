@@ -59,6 +59,7 @@ class CoreService {
     this.calculate_b_values();
     this.num_teams_to_project = new Array(this.num_projects).fill(1);
     this.set_initial_allocations();
+    this.run_algorithm("ILP");
     this.dataStage = "Stage2";
   }
 
@@ -74,6 +75,7 @@ class CoreService {
             this.preference_scalar * this.preference[i][j]);
         if (a > this.max) this.max = a;
         if (a < this.min) this.min = a;
+        this.b[i][j] = a;
       }
     }
     this.notifyListeners();
@@ -86,6 +88,16 @@ class CoreService {
   }
 
   // Data access functions
+  get_score(): number {
+    let score = 0;
+    for (const allocation in this.allocations) {
+      const project = parseInt(allocation[1]) - 1;
+      if (project == 0)
+        score +=
+          this.b[parseInt(allocation[0]) - 1][parseInt(allocation[1]) - 1];
+    }
+    return score;
+  }
   get_num_teams(): number {
     return this.num_teams;
   }
@@ -212,6 +224,14 @@ class CoreService {
 
   set_impact_value(team: number, project: number, impact: number): void {
     this.impact[team - 1][project - 1];
+  }
+
+  get_num_teams_to_projects(): number[] {
+    return this.num_teams_to_project;
+  }
+
+  set_num_teams_to_project(teams: number, project: number): void {
+    this.num_teams_to_project[project - 1] = teams;
   }
 
   // Allocation functions
@@ -407,12 +427,25 @@ class CoreService {
   }
 
   log_dump() {
-    console.log(this.impact);
-    console.log(this.capability);
-    console.log(this.preference);
-    console.log(this.allocations);
-    console.log(this.rejections);
-    console.log(this.allocation_sets);
+    console.log("Initial Impact:", this.initial_impact);
+    console.log("Initial Capability:", this.initial_capability);
+    console.log("Initial Preference:", this.initial_preference);
+    console.log("Impact:", this.impact);
+    console.log("Capability:", this.capability);
+    console.log("Preference:", this.preference);
+    console.log("B Values:", this.b);
+    console.log("Number of Teams to Project:", this.num_teams_to_project);
+    console.log("Capability Scalar:", this.capability_scalar);
+    console.log("Preference Scalar:", this.preference_scalar);
+    console.log("Number of Teams:", this.num_teams);
+    console.log("Number of Projects:", this.num_projects);
+    console.log("Allocations:", this.allocations);
+    console.log("Rejections:", this.rejections);
+    console.log("Allocation Sets:", this.allocation_sets);
+    console.log("Min Value:", this.min);
+    console.log("Max Value:", this.max);
+    console.log("Data Stage:", this.dataStage);
+    console.log("Listeners:", this.listeners);
   }
 }
 

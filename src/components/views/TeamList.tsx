@@ -4,7 +4,6 @@ import { useCoreService } from "../../CoreServiceContext";
 
 interface Props {
   project: number;
-  team: number;
 }
 
 const TeamList: React.FC<Props> = (props) => {

@@ -23,7 +23,6 @@ function SpreadsheetView() {
       setSpreadsheetData(coreService.get_b_values());
       setNumTeams(coreService.get_num_teams());
       setNumProjects(coreService.get_num_projects());
-      console.log(spreadsheetData);
     };
 
     updateData();
@@ -37,7 +36,6 @@ function SpreadsheetView() {
   }, [coreService]);
 
   const handleCellClick = (team: number, project: number) => {
-    console.log(team, project, coreService.get_pairing_data(team, project));
     setModalTeam(team);
     setModalProject(project);
     setIsModalShown(true);

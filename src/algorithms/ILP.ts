@@ -48,12 +48,12 @@ const ILPAllocator = (
 
   for (var i = 1; i < allocations.length; i++) {
     if (allocations[i][1] != 0) {
-      variables[`x_${allocations[i][0]}_${allocations[i][1]}`]["score"] = 9999;
+      variables[`x_${allocations[i][0]}_${allocations[i][1]}`]["score"] = 999999;
     }
   }
 
   for (var j = 1; j < rejections.length; j++) {
-    variables[`x_${rejections[j][0]}_${rejections[j][1]}`]["score"] = -9999;
+    variables[`x_${rejections[j][0]}_${rejections[j][1]}`]["score"] = -999999;
   }
 
   const model = {

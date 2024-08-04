@@ -40,6 +40,7 @@ export interface AllocationSet {
 
 export type NavPage =
   | "Upload"
+  | "TeamsToProjects"
   | "Algorithm"
   | "Allocations"
   | "Rejections"
@@ -47,7 +48,7 @@ export type NavPage =
   | "TeamList"
   | "Spreadsheet";
 
-export type InputStage = "Stage1" | "Stage2" | "Open";
+export type InputStage = "Stage1" | "Stage2";
 
 export interface PageView {
   page: NavPage;

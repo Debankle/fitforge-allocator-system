@@ -9,23 +9,26 @@ import Algorithm from "./components/views/Algorithm";
 import Rejections from "./components/views/Rejections";
 import ProjectList from "./components/views/ProjectList";
 import TeamList from "./components/views/TeamList";
+import TeamsToProjects from "./components/views/TeamsToProjects";
 import { useNavigation } from "./NavServiceContext";
-import './App.css'; // Import your CSS file
+import "./App.css"; // Import your CSS file
 
 function App() {
   const coreService = useCoreService();
   const { currentPage } = useNavigation();
-  const [isDataLoaded, setIsDataLoaded] = useState(coreService.isDataLoaded);
+  const [dataStage, setDataStage] = useState(coreService.dataStage);
 
   useEffect(() => {
-    setIsDataLoaded(coreService.isDataLoaded);
+    setDataStage(coreService.dataStage);
   }, [currentPage]);
 
   const renderComponent = () => {
-    if (!isDataLoaded) return <InputComponent />;
+    if (dataStage == "Stage1") return <InputComponent />;
     switch (currentPage.page) {
       case "Upload":
         return <InputComponent />;
+      case "TeamsToProjects":
+        return <TeamsToProjects />;
       case "Algorithm":
         return <Algorithm />;
       case "Spreadsheet":
@@ -45,7 +48,6 @@ function App() {
 
   return (
     <div className="app-container">
-
       <div className="sticky top-0">
         <Toolbar />
         <NavBar />
@@ -54,7 +56,6 @@ function App() {
         {renderComponent()}
       </div>
     </div>
-
   );
 }
 
