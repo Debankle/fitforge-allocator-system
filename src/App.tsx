@@ -10,6 +10,7 @@ import Rejections from "./components/views/Rejections";
 import ProjectList from "./components/views/ProjectList";
 import TeamList from "./components/views/TeamList";
 import TeamsToProjects from "./components/views/TeamsToProjects";
+import PairingDiv from "./components/Pairing";
 import { useNavigation } from "./NavServiceContext";
 import "./App.css"; // Import your CSS file
 
@@ -32,7 +33,7 @@ function App() {
       case "Algorithm":
         return <Algorithm />;
       case "Spreadsheet":
-        return <SpreadsheetView />;
+        return <SpreadsheetView team={currentPage.data.team} project={currentPage.data.project}/>;
       case "Allocations":
         return <Allocations />;
       case "Rejections":
@@ -41,6 +42,14 @@ function App() {
         return <ProjectList team={currentPage.data.team} />;
       case "TeamList":
         return <TeamList project={currentPage.data.project} />;
+      case "PairingTest":
+        return (
+          <PairingDiv
+            team={currentPage.data.team}
+            project={currentPage.data.project}
+            onToggle={() => {}}
+          />
+        );
       default:
         return <InputComponent />;
     }

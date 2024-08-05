@@ -46,7 +46,10 @@ export type NavPage =
   | "Rejections"
   | "ProjectList"
   | "TeamList"
-  | "Spreadsheet";
+  | "Spreadsheet"
+  | "PairingTest";
+
+export type AllocationState = "Allocated" | "Rejected" | "Neither";
 
 export type InputStage = "Stage1" | "Stage2";
 

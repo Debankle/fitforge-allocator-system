@@ -4,7 +4,6 @@ import ListView from "./ListView";
 function Rejections() {
   const coreSerivce = useCoreService();
   const rejection = coreSerivce.get_rejections();
-  console.log(rejection);
 
   return (
     <div>

@@ -70,13 +70,12 @@ function ListView(props: ListProps) {
         {sortedPairingData.map((pairing, index) => (
           <div
             key={`${pairing.team}-${pairing.project}`}
-            className={`bg-white p-4 border rounded shadow ${expandedIndex.includes(index) ? "expanded" : ""}`}
+            className={`bg-white p-1 border rounded shadow ${expandedIndex.includes(index) ? "expanded" : ""}`}
             onClick={() => handleToggle(index)}
           >
             <PairingDiv
               team={pairing.team}
               project={pairing.project}
-              isShown={expandedIndex.includes(index)}
               onToggle={() => handleToggle(index)}
             />
           </div>

@@ -180,10 +180,12 @@ class CoreService {
 
   set_capability_scalar(capability: number): void {
     this.capability_scalar = capability;
+    this.calculate_b_values();
   }
 
   set_preference_scalar(preference: number): void {
     this.preference_scalar = preference;
+    this.calculate_b_values();
   }
 
   get_capability_scalar(): number {
@@ -257,7 +259,7 @@ class CoreService {
       console.log("pairing is already rejected");
       return false;
     }
-    if (this.allocations[team - 1][1] == 0) {
+    if (!this.is_pairing_allocated(team, project)) {
       if (
         this.allocations.filter((row) => row[1] === project).length <
         this.num_teams_to_project[project - 1]
@@ -276,7 +278,7 @@ class CoreService {
 
   remove_allocation(team: number, project: number): boolean {
     if (this.is_pairing_allocated(team, project)) {
-      this.allocations[team - 1][1] == 0;
+      this.allocations[team - 1][1] = 0;
       return true;
     } else {
       console.log("pairing not allocated");

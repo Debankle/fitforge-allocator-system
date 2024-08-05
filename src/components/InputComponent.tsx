@@ -1,4 +1,4 @@
-import { ChangeEvent, MouseEventHandler, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import readXlsxFile, { readSheetNames } from "read-excel-file";
 import { useCoreService } from "../CoreServiceContext";
 import { Setup } from "../interfaces";
@@ -130,7 +130,7 @@ function InputComponent() {
             for (let j = colIndex; j < rows[0].length; j++) {
               const cellValue = rows[i][j];
               if (typeof cellValue == "number") {
-                dataArray[i - 1][j - 1] = cellValue;
+                dataArray[i - 1][j - colIndex] = cellValue;
               }
             }
           }
