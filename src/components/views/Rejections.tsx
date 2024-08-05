@@ -10,7 +10,11 @@ function Rejections() {
       {rejection.length == 0 ? (
         "No rejected pairings"
       ) : (
-        <ListView title={"Rejected Pairings"} pairings={rejection} />
+        <ListView
+          title={"Rejected Pairings"}
+          pairings={rejection}
+          sortBy={"team"}
+        />
       )}
     </div>
   );

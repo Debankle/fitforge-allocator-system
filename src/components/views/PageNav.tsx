@@ -38,6 +38,7 @@ const Pagination: React.FC<PaginationProps> = ({
             <ListView
                 title={title} 
                 pairings={paginatedData}
+                sortBy={"team"}
             />
         </TabPanel>
         ))}

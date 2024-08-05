@@ -1,19 +1,24 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pairing } from "../../interfaces";
 import PairingDiv from "../Pairing";
 import { useCoreService } from "../../CoreServiceContext";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
 
 interface ListProps {
   title: string;
   pairings: number[][];
+  sortBy: keyof Pairing;
 }
 
 function ListView(props: ListProps) {
   const coreService = useCoreService();
   const [pairingData, setPairingData] = useState<Pairing[]>([]);
-  const [sortProperty, setSortProperty] = useState<keyof Pairing>("team");
+  const [sortProperty, setSortProperty] = useState<keyof Pairing>(props.sortBy);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
+  const [activePage, setActivePage] = useState<number>(0);
+  const itemsPerPage = 9;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,6 +34,7 @@ function ListView(props: ListProps) {
     fetchData();
   }, [props.pairings]);
 
+  // Sort the pairing data
   const sortedPairingData = [...pairingData].sort((a, b) => {
     const compareA = a[sortProperty];
     const compareB = b[sortProperty];
@@ -36,6 +42,13 @@ function ListView(props: ListProps) {
     if (compareA > compareB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
+
+  // Calculate pagination
+  const totalPages = Math.ceil(sortedPairingData.length / itemsPerPage);
+  const paginatedData = sortedPairingData.slice(
+    activePage * itemsPerPage,
+    (activePage + 1) * itemsPerPage
+  );
 
   const handleToggle = (index: number) => {
     setExpandedIndex((prev) =>
@@ -50,15 +63,12 @@ function ListView(props: ListProps) {
         value={sortProperty}
         onChange={(e) => setSortProperty(e.target.value as keyof Pairing)}
       >
-        <option value="fit_value">Fit Value</option>
-        <option value="pref_value">Preference Value</option>
-        <option value="b_value">B Value</option>
+        <option value="impact">Impact</option>
+        <option value="capability">Capability</option>
+        <option value="preference">Preference</option>
         <option value="team">Team</option>
         <option value="project">Project</option>
-        <option value="fit_scalar">Fit Scalar</option>
-        <option value="pref_scalar">Preference Scalar</option>
-        <option value="fit_scalar">Fit Scalar</option>
-        <option value="pref_scalar">Preference Scalar</option>
+        <option value="b_value">B Value</option>
       </select>
       <label>-</label>
       <select onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}>
@@ -66,21 +76,38 @@ function ListView(props: ListProps) {
         <option value="desc">Descending</option>
       </select>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sortedPairingData.map((pairing, index) => (
-          <div
-            key={`${pairing.team}-${pairing.project}`}
-            className={`bg-white p-1 border rounded shadow ${expandedIndex.includes(index) ? "expanded" : ""}`}
-            onClick={() => handleToggle(index)}
-          >
-            <PairingDiv
-              team={pairing.team}
-              project={pairing.project}
-              onToggle={() => handleToggle(index)}
-            />
-          </div>
+      <Tabs
+        selectedIndex={activePage}
+        onSelect={(index) => setActivePage(index)}
+      >
+        <TabList>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <Tab key={index}>Page {index + 1}</Tab>
+          ))}
+        </TabList>
+
+        {Array.from({ length: totalPages }, (_, index) => (
+          <TabPanel key={index}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {paginatedData.map((pairing, index) => (
+                <div
+                  key={`${pairing.team}-${pairing.project}`}
+                  className={`bg-white p-1 border rounded shadow ${
+                    expandedIndex.includes(index) ? "expanded" : ""
+                  }`}
+                  onClick={() => handleToggle(index)}
+                >
+                  <PairingDiv
+                    team={pairing.team}
+                    project={pairing.project}
+                    onToggle={() => handleToggle(index)}
+                  />
+                </div>
+              ))}
+            </div>
+          </TabPanel>
         ))}
-      </div>
+      </Tabs>
     </div>
   );
 }

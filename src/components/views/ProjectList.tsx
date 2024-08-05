@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PageNav from "./PageNav";
 import { useCoreService } from "../../CoreServiceContext";
+import ListView from "./ListView";
 
 interface Props {
   team: number;
@@ -38,11 +39,15 @@ const ProjectList: React.FC<Props> = (props) => {
         ))}
       </select>
 
+      <ListView pairings={pairings} title={`Pairings for team ${team}`} sortBy={"project"} />
+
+        {/*}
       <PageNav
         title={`Pairings for team ${team}`}
         pairings={pairings}
         itemsPerPage={itemsPerPage}
       />
+      {*/}
     </div>
   );
 };

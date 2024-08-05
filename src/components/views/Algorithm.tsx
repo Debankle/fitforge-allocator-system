@@ -66,6 +66,7 @@ function Algorithm() {
       <ListView
         title={"Algorithm Pairings"}
         pairings={currentAlgorithmSet.allocation}
+        sortBy={"team"}
       />
     </div>
   );
