@@ -20,6 +20,9 @@ function PairingDiv(props: Props) {
   const [allocationStatus, setAllocationStatus] =
     useState<AllocationState>("Neither");
   const [error, setError] = useState<string | null>(null);
+  const [capVal, setCapVal] = useState<number>(pairingData.capability);
+  const [prefVal, setPrefVal] = useState<number>(pairingData.preference);
+  const [impactVal, setImpactVal] = useState<number>(pairingData.impact);
   const idPrefix = useId();
 
   useEffect(() => {
@@ -32,6 +35,9 @@ function PairingDiv(props: Props) {
       } else {
         setAllocationStatus("Neither");
       }
+      setCapVal(pairingData.capability);
+      setPrefVal(pairingData.preference);
+      setImpactVal(pairingData.impact);
     };
 
     updateData();
@@ -142,15 +148,75 @@ function PairingDiv(props: Props) {
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="flex flex-col">
           <div className="font-bold text-sm">Capability:</div>
-          <div>{formatNumber(pairingData.capability)}</div>
+          {mode == "Read" ? (
+            <div>{formatNumber(pairingData.capability)}</div>
+          ) : (
+            <input
+              type="number"
+              value={capVal}
+              step={"0.000001"}
+              className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setCapVal(value);
+                  coreService.set_capability_value(
+                    props.team,
+                    props.project,
+                    value
+                  );
+                }
+              }}
+            />
+          )}
         </div>
         <div className="flex flex-col">
           <div className="font-bold text-sm">Preference:</div>
-          <div>{formatNumber(pairingData.preference)}</div>
+          {mode == "Read" ? (
+            <div>{formatNumber(pairingData.preference)}</div>
+          ) : (
+            <input
+              type="number"
+              value={prefVal}
+              step={"0.000001"}
+              className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setPrefVal(value);
+                  coreService.set_preference_value(
+                    props.team,
+                    props.project,
+                    value
+                  );
+                }
+              }}
+            />
+          )}
         </div>
         <div className="flex flex-col">
           <div className="font-bold text-sm">Impact:</div>
-          <div>{formatNumber(pairingData.impact)}</div>
+          {mode == "Read" ? (
+            <div>{formatNumber(pairingData.impact)}</div>
+          ) : (
+            <input
+              type="number"
+              value={impactVal}
+              step={"0.000001"}
+              className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setImpactVal(value);
+                  coreService.set_impact_value(
+                    props.team,
+                    props.project,
+                    value
+                  );
+                }
+              }}
+            />
+          )}
         </div>
         <div className="flex flex-col">
           <div className="font-bold text-sm">Cap Scalar:</div>
@@ -243,8 +309,9 @@ function PairingDiv(props: Props) {
           Project {props.project} team list
         </button>
         <button
-          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 opacity-50 cursor-not-allowed"
           onClick={() => setMode(mode === "Edit" ? "Read" : "Edit")}
+          disabled={true}
         >
           {mode === "Edit" ? "Switch to Read" : "Switch to Edit"}
         </button>

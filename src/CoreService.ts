@@ -90,11 +90,11 @@ class CoreService {
   // Data access functions
   get_score(): number {
     let score = 0;
-    for (const allocation in this.allocations) {
-      const project = parseInt(allocation[1]) - 1;
-      if (project == 0)
-        score +=
-          this.b[parseInt(allocation[0]) - 1][parseInt(allocation[1]) - 1];
+    for (let i = 0; i < this.allocations.length; i++) {
+      const inner_array = this.allocations[i];
+      if (inner_array[1] != 0) {
+        score += this.b[inner_array[0] - 1][inner_array[1] - 1];
+      }
     }
     return score;
   }
@@ -214,6 +214,7 @@ class CoreService {
     capability: number
   ): void {
     this.capability[team - 1][project - 1] = capability;
+    this.calculate_b_values();
   }
 
   set_preference_value(
@@ -222,10 +223,12 @@ class CoreService {
     preference: number
   ): void {
     this.preference[team - 1][project - 1] = preference;
+    this.calculate_b_values();
   }
 
   set_impact_value(team: number, project: number, impact: number): void {
-    this.impact[team - 1][project - 1];
+    this.impact[team - 1][project - 1] = impact;
+    this.calculate_b_values();
   }
 
   get_num_teams_to_projects(): number[] {
