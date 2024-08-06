@@ -1,12 +1,11 @@
+import { useId, useState, useEffect } from "react";
 import { useCoreService } from "../CoreServiceContext";
-import { Pairing } from "../interfaces";
-import { useEffect, useId, useState } from "react";
 import { useNavigation } from "../NavServiceContext";
+import { AllocationState, Pairing } from "../interfaces";
 
 interface Props {
   team: number;
   project: number;
-  isShown: boolean;
   onToggle: () => void;
 }
 
@@ -14,27 +13,25 @@ function PairingDiv(props: Props) {
   const coreService = useCoreService();
   const { navigate } = useNavigation();
   const [hover, setHover] = useState<boolean>(false);
-  const [isAllocated, setIsAllocated] = useState<boolean>(
-    coreService.is_pairing_allocated(props.team, props.project)
-  );
-  const [isRejected, setIsRejected] = useState<boolean>(
-    coreService.is_pairing_rejected(props.team, props.project)
-  );
   const [pairingData, setPairingData] = useState<Pairing>(
     coreService.get_pairing_data(props.team, props.project)
   );
-  const bgColor: string = coreService.get_bg_color(pairingData.b_value);
-  const allocatedCheckmark = useId();
-  const rejectedCheckmark = useId();
-  const isShown = true;
+  const [mode, setMode] = useState<"Read" | "Edit">("Read");
+  const [allocationStatus, setAllocationStatus] =
+    useState<AllocationState>("Neither");
+  const [error, setError] = useState<string | null>(null);
+  const idPrefix = useId();
 
   useEffect(() => {
     const updateData = () => {
       setPairingData(coreService.get_pairing_data(props.team, props.project));
-      setIsRejected(coreService.is_pairing_rejected(props.team, props.project));
-      setIsAllocated(
-        coreService.is_pairing_allocated(props.team, props.project)
-      );
+      if (coreService.is_pairing_allocated(props.team, props.project)) {
+        setAllocationStatus("Allocated");
+      } else if (coreService.is_pairing_rejected(props.team, props.project)) {
+        setAllocationStatus("Rejected");
+      } else {
+        setAllocationStatus("Neither");
+      }
     };
 
     updateData();
@@ -47,45 +44,53 @@ function PairingDiv(props: Props) {
     };
   }, [props.team, props.project, coreService]);
 
-  const allocatedCheckmarkChange = () => {
-    if (isRejected) {
-      coreService.remove_rejection(props.team, props.project);
-      coreService.set_allocation(props.team, props.project);
-      setIsRejected(false);
-      setIsAllocated(true);
-    } else if (isAllocated) {
-      coreService.remove_allocation(props.team, props.project);
-      setIsAllocated(false);
+  const handleAllocationChange = (value: AllocationState) => {
+    setError(null);
+
+    let success = false;
+
+    switch (value) {
+      case "Neither":
+        if (allocationStatus === "Allocated") {
+          success = coreService.remove_allocation(props.team, props.project);
+        } else if (allocationStatus === "Rejected") {
+          success = coreService.remove_rejection(props.team, props.project);
+        } else {
+          success = true;
+        }
+        break;
+
+      case "Allocated":
+        if (allocationStatus === "Neither") {
+          success = coreService.set_allocation(props.team, props.project);
+        } else if (allocationStatus === "Rejected") {
+          coreService.remove_rejection(props.team, props.project);
+          success = coreService.set_allocation(props.team, props.project);
+        }
+        break;
+
+      case "Rejected":
+        if (allocationStatus === "Neither") {
+          success = coreService.set_rejection(props.team, props.project);
+        } else if (allocationStatus === "Allocated") {
+          coreService.remove_allocation(props.team, props.project);
+          success = coreService.set_rejection(props.team, props.project);
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    if (success) {
+      setAllocationStatus(value);
     } else {
-      coreService.set_allocation(props.team, props.project);
-      setIsAllocated(true);
+      setError("Failed to update allocation status. Please try again");
     }
   };
 
-  const rejectedCheckmarkChange = () => {
-    if (isAllocated) {
-      coreService.remove_allocation(props.team, props.project);
-      coreService.set_rejection(props.team, props.project);
-      setIsAllocated(false);
-      setIsRejected(true);
-    } else if (isRejected) {
-      coreService.remove_rejection(props.team, props.project);
-      setIsRejected(false);
-    } else {
-      coreService.set_rejection(props.team, props.project);
-      setIsRejected(true);
-    }
-  };
-
-  const toggleHover = () => {
-    setHover(!hover);
-  };
-
-  const spreadsheet = () => {
-    navigate({
-      page: "Spreadsheet",
-      data: { team: props.team, project: props.project },
-    });
+  const toggleHover = (type: boolean) => {
+    setHover(type);
   };
 
   const teamList = () => {
@@ -96,129 +101,153 @@ function PairingDiv(props: Props) {
     navigate({ page: "TeamList", data: { project: props.project } });
   };
 
-  const handleBackgroundClick = (_: React.MouseEvent<HTMLDivElement>) => {
-      props.onToggle();    
+  const spreadsheet = () => {
+    navigate({
+      page: "Spreadsheet",
+      data: { team: props.team, project: props.project },
+    });
   };
 
-  var styleSheet: any;
-  if (hover) {
-    styleSheet = { backgroundColor: "rgba(" + bgColor + "0.5)", display: 'inline-block', transition:'all 0.3s' };
-  } else {
-    styleSheet = { backgroundColor: "rgba(" + bgColor + "1)", display: 'inline-block', transition: 'all 0.3s' };
-  }
+  const formatNumber = (value: any = -1, decimals = 6) => {
+    return value === -1 ? "-" : value.toFixed(decimals);
+  };
 
   return (
     <div
-      className="flex flex-col m-1"
-      style={styleSheet}
-      onMouseEnter={toggleHover}
-      onMouseLeave={toggleHover}
-      onClick={handleBackgroundClick}
+      className="flex flex-col w-full max-w-screen-lg mx-auto p-4 bg-gray-100 rounded shadow-md"
+      style={{
+        display: "inline-block",
+        transition: "all 0.3s",
+        backgroundColor: coreService.get_bg_colour(
+          pairingData.b_value,
+          hover ? 0.5 : 1
+        ),
+      }}
+      onMouseEnter={() => toggleHover(true)}
+      onMouseLeave={() => toggleHover(false)}
     >
-      <div className="flex p-2">
-        <div className="flex-1 flex flex-col justify-center ml-2">
-          <div className="text-xl font-bold">Team:</div>
+      {/* Top Section for Team and Project */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col">
+          <div className="font-bold text-xl">Team:</div>
           <div className="text-2xl">{props.team}</div>
         </div>
-
-        <div className="flex-1 flex flex-col items-center">
-          <div className="grid grid-cols-2 gap-4 w-full text-center">
-            <div>
-              <div className="font-bold">Fit Value:</div>
-              <div>
-                {pairingData.fit_value == -1 ? "-" : pairingData.fit_value}
-              </div>
-            </div>
-            <div>
-              <div className="font-bold">Fit Scalar:</div>
-              <div>
-                {pairingData.fit_scalar == -1 ? "-" : pairingData.fit_scalar}
-              </div>
-            </div>
-            <div>
-              <div className="font-bold">Pref Value:</div>
-              <div>
-                {pairingData.pref_value == -1 ? "-" : pairingData.pref_value}
-              </div>
-            </div>
-            <div>
-              <div className="font-bold">Pref Scalar:</div>
-              <div>
-                {pairingData.pref_scalar == -1 ? "-" : pairingData.pref_scalar}
-              </div>
-            </div>
-          </div>
-          <div className="mt-2 w-full text-center">
-            <div className="font-bold">B Value:</div>
-            <div>{pairingData.b_value == -1 ? "-" : pairingData.b_value}</div>
-          </div>
-          <div className="grid grid-cols-2 gap-4 w-full text-center">
-            <div>
-              <label className="text-white" htmlFor={allocatedCheckmark}>
-                Allocate:
-              </label>
-              <input
-                id={allocatedCheckmark}
-                type="checkbox"
-                checked={isAllocated}
-                onChange={allocatedCheckmarkChange}
-                onClick={(e) => e.stopPropagation()}
-              ></input>
-            </div>
-            <div>
-              <label className="text-white" htmlFor={rejectedCheckmark}>
-                Reject:
-              </label>
-              <input
-                id={rejectedCheckmark}
-                type="checkbox"
-                checked={isRejected}
-                onChange={rejectedCheckmarkChange}
-                onClick={(e) => e.stopPropagation()}
-              ></input>
-            </div>
-          </div>
+        <div className="flex flex-col">
+          <div className="font-bold text-xl">Project:</div>
+          <div className="text-2xl">{props.project}</div>
         </div>
+      </div>
 
-        <div className="flex-1 flex flex-col justify-center items-end text-right mr-3">
-          <div className="text-xl font-bold">Project:</div>
-          <div className="text-2xl">
-            {pairingData.project == -1 ? "-" : props.project}
-          </div>
+      {/* Data Values Section */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="flex flex-col">
+          <div className="font-bold text-sm">Capability:</div>
+          <div>{formatNumber(pairingData.capability)}</div>
         </div>
+        <div className="flex flex-col">
+          <div className="font-bold text-sm">Preference:</div>
+          <div>{formatNumber(pairingData.preference)}</div>
+        </div>
+        <div className="flex flex-col">
+          <div className="font-bold text-sm">Impact:</div>
+          <div>{formatNumber(pairingData.impact)}</div>
+        </div>
+        <div className="flex flex-col">
+          <div className="font-bold text-sm">Cap Scalar:</div>
+          <div>{formatNumber(pairingData.capability_scalar)}</div>
+        </div>
+        <div className="flex flex-col">
+          <div className="font-bold text-sm">Preference Scalar:</div>
+          <div>{formatNumber(pairingData.preference_scalar)}</div>
+        </div>
+        <div className="flex flex-col">
+          <div className="font-bold text-sm">B Value:</div>
+          <div>{formatNumber(pairingData.b_value)}</div>
+        </div>
+      </div>
 
-        {/*props.isShown will hide this and allow for toggles, but it seems to look better without, idk im not the UI guy */}
-        {isShown && (
-          <div className="flex-1 flex flex-col justify-center items-end text-right ml-2 mr-2">
-            <button
-              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700 mt-1 mb-1"
-              onClick={(e) => {
-                e.stopPropagation();
-                spreadsheet();
-              }}
-            >
-              Show in spreadsheet
-            </button>
-            <button
-              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700 mt-1 mb-1"
-              onClick={(e) => {
-                e.stopPropagation();
-                teamList();
-              }}
-            >
-              Team {props.team} project list
-            </button>
-            <button
-              className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-700 mt-1 mb-1"
-              onClick={(e) => {
-                e.stopPropagation();
-                projectList();
-              }}
-            >
-              Project {props.project} team list
-            </button>
-          </div>
-        )}
+      {/* Allocation Status Section */}
+      <div className="flex justify-center mb-4">
+        <div className="flex items-center">
+          <input
+            type="radio"
+            id={`${idPrefix}-Neither`}
+            name={`${idPrefix}-allocationStatus`}
+            value="Neither"
+            checked={allocationStatus === "Neither"}
+            onChange={() => handleAllocationChange("Neither")}
+            className="mr-1"
+          />
+          <label htmlFor={`${idPrefix}-neither`} className="mr-3">
+            Neither
+          </label>
+
+          <input
+            type="radio"
+            id={`${idPrefix}-allocate`}
+            name={`${idPrefix}-allocationStatus`}
+            value="Allocated"
+            checked={allocationStatus === "Allocated"}
+            onChange={() => handleAllocationChange("Allocated")}
+            className="mr-1"
+          />
+          <label htmlFor={`${idPrefix}-allocate`} className="mr-3">
+            Allocate
+          </label>
+
+          <input
+            type="radio"
+            id={`${idPrefix}-reject`}
+            name={`${idPrefix}-allocationStatus`}
+            value="Rejected"
+            checked={allocationStatus === "Rejected"}
+            onChange={() => handleAllocationChange("Rejected")}
+            className="mr-1"
+          />
+          <label htmlFor={`${idPrefix}-reject`} className="mr-3">
+            Reject
+          </label>
+        </div>
+      </div>
+
+      {/* Error Message */}
+      {error && <div className="text-black-500 text-center mb-4">{error}</div>}
+
+      {/* Buttons Section */}
+      <div className="flex justify-center gap-2">
+        <button
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+          onClick={(e) => {
+            e.stopPropagation();
+            spreadsheet();
+          }}
+        >
+          Spreadsheet
+        </button>
+        <button
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+          onClick={(e) => {
+            e.stopPropagation();
+            teamList();
+          }}
+        >
+          Team {props.team} project list
+        </button>
+        <button
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+          onClick={(e) => {
+            e.stopPropagation();
+            projectList();
+          }}
+        >
+          Project {props.project} team list
+        </button>
+        <button
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+          onClick={() => setMode(mode === "Edit" ? "Read" : "Edit")}
+        >
+          {mode === "Edit" ? "Switch to Read" : "Switch to Edit"}
+        </button>
       </div>
     </div>
   );

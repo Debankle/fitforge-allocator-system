@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import "react-tabs/style/react-tabs.css";
-import ListView from "./ListView";
+import PageNav from "./PageNav";
 import { useCoreService } from "../../CoreServiceContext";
+import ListView from "./ListView";
 
 interface Props {
   team: number;
 }
 
-const ProjectList = (props: Props) => {
+const ProjectList: React.FC<Props> = (props) => {
   const coreService = useCoreService();
   const [team, setTeam] = useState<number>(props.team);
   const [pairings, setPairings] = useState<number[][]>([]);
-  const [activePage, setActivePage] = useState<number>(0);
 
   const numTeams = coreService.get_num_teams();
   const numProjects = coreService.get_num_projects();
-  const itemsPerPage = 10; //-------------------------NUMBER OF ITEMS-----------------------------------------------
+  const itemsPerPage = 12;
+
   useEffect(() => {
     const newPairings: number[][] = [];
     for (let i = 1; i <= numProjects; i++) {
@@ -25,16 +24,8 @@ const ProjectList = (props: Props) => {
     setPairings(newPairings);
   }, [team, numProjects]);
 
-  const totalPages = Math.ceil(pairings.length / itemsPerPage);
-
-  const paginatedData = pairings.slice(
-    activePage * itemsPerPage,
-    (activePage + 1) * itemsPerPage
-  );
-
   const handleTeamChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setTeam(parseInt(event.target.value));
-    setActivePage(0);
   };
 
   return (
@@ -48,25 +39,15 @@ const ProjectList = (props: Props) => {
         ))}
       </select>
 
-      <Tabs
-        selectedIndex={activePage}
-        onSelect={(index) => setActivePage(index)}
-      >
-        <TabList>
-          {Array.from({ length: totalPages }, (_, index) => (
-            <Tab key={index}>Page {index + 1}</Tab>
-          ))}
-        </TabList>
+      <ListView pairings={pairings} title={`Pairings for team ${team}`} sortBy={"project"} />
 
-        {Array.from({ length: totalPages }, (_, index) => (
-          <TabPanel key={index}>
-            <ListView
-              title={`Pairings for team ${team}`}
-              pairings={paginatedData}
-            />
-          </TabPanel>
-        ))}
-      </Tabs>
+        {/*}
+      <PageNav
+        title={`Pairings for team ${team}`}
+        pairings={pairings}
+        itemsPerPage={itemsPerPage}
+      />
+      {*/}
     </div>
   );
 };

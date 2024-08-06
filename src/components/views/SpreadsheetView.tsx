@@ -1,40 +1,68 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCoreService } from "../../CoreServiceContext";
-import { useNavigation } from "../../NavServiceContext";
 import PairingDiv from "../Pairing";
 import "./SpreadsheetView.css"; // Import the CSS file
 
-
-function SpreadsheetView() {
+function SpreadsheetView({ team = 1, project = 1 }) {
   const coreService = useCoreService();
-  const { navigate } = useNavigation();
-  const [displayType, setDisplayType] = useState<"Numbers" | "Colours" | "Both" | "Assigned">("Numbers");
   const [isModalShown, setIsModalShown] = useState<boolean>(false);
-  const numTeams = coreService.get_num_teams();
-  const numProjects = coreService.get_num_projects();
+  const [spreadsheetData, setSpreadsheetData] = useState<number[][]>(
+    coreService.get_b_values()
+  );
+  const [numTeams, setNumTeams] = useState<number>(coreService.get_num_teams());
+  const [numProjects, setNumProjects] = useState<number>(
+    coreService.get_num_projects()
+  );
   const [modalTeam, setModalTeam] = useState<number>(0);
   const [modalProject, setModalProject] = useState<number>(0);
 
+  const cellRefs = useRef<Map<string, HTMLTableCellElement>>(new Map());
+
+  useEffect(() => {
+    const updateData = () => {
+      setSpreadsheetData([...coreService.get_b_values()]);
+      setNumTeams(coreService.get_num_teams());
+      setNumProjects(coreService.get_num_projects());
+    };
+
+    updateData();
+
+    const listener = () => updateData();
+    coreService.addListener(listener);
+
+    return () => {
+      coreService.removeListener(listener);
+    };
+  }, [coreService]);
+
   const handleCellClick = (team: number, project: number) => {
-    console.log(team, project, coreService.get_pairing_data(team, project));
     setModalTeam(team);
     setModalProject(project);
     setIsModalShown(true);
   };
+
+  const formatNumber = (value: any = -1, decimals = 6) => {
+    return value === -1 ? "-" : value.toFixed(decimals);
+  };
+
+  const scrollToCell = (teamIndex: number, projectIndex: number) => {
+    const cellKey = `${teamIndex + 1}-${projectIndex + 1}`;
+    const cellElement = cellRefs.current.get(cellKey);
+    if (cellElement) {
+      cellElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  scrollToCell(team,project);
 
   return (
     <div className="spreadsheet-container">
       <table className="spreadsheet-table">
         <thead>
           <tr>
-            <th className="sticky-header">
-              Team/Project
-            </th>
+            <th className="sticky-header">Team/Project</th>
             {Array.from({ length: numProjects || 0 }, (_, projectIndex) => (
-              <th
-                key={projectIndex + 1}
-                className="sticky-header"
-              >
+              <th key={projectIndex + 1} className="sticky-header">
                 Project {projectIndex + 1}
               </th>
             ))}
@@ -43,20 +71,29 @@ function SpreadsheetView() {
         <tbody>
           {Array.from({ length: numTeams }, (_, teamIndex) => (
             <tr key={teamIndex + 1}>
-              <td className="sticky-cell">
-                Team {teamIndex + 1}
-              </td>
-              {Array.from({ length: numProjects }, (_, projectIndex) => (
-                <td
-                  key={projectIndex + 1}
-                  style={{
-                    backgroundColor: coreService.get_cell_color(teamIndex + 1, projectIndex + 1),
-                  }}
-                  onClick={() => handleCellClick(teamIndex + 1, projectIndex + 1)}
-                >
-                  {coreService.get_b_value(teamIndex + 1, projectIndex + 1)}
-                </td>
-              ))}
+              <td className="sticky-cell">Team {teamIndex + 1}</td>
+              {Array.from({ length: numProjects }, (_, projectIndex) => {
+                const cellKey = `${teamIndex + 1}-${projectIndex + 1}`;
+                return (
+                  <td
+                    key={cellKey}
+                    ref={(el) => {
+                        if (el) cellRefs.current.set(cellKey,el);
+                    }}
+                    style={{
+                      backgroundColor: coreService.get_cell_bg_colour(
+                        teamIndex + 1,
+                        projectIndex + 1
+                      ),
+                    }}
+                    onClick={() =>
+                      handleCellClick(teamIndex + 1, projectIndex + 1)
+                    }
+                  >
+                    {formatNumber(spreadsheetData[teamIndex][projectIndex])}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>
@@ -74,7 +111,6 @@ function SpreadsheetView() {
             <PairingDiv
               team={modalTeam}
               project={modalProject}
-              isShown={true}
               onToggle={() => {}}
             />
             <button

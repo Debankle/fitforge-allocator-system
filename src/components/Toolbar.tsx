@@ -10,20 +10,30 @@ function Toolbar() {
   const coreService = useCoreService();
 
   useEffect(() => {
-    setFitScale(coreService.get_fit_scalar());
-    setPrefScale(coreService.get_pref_scalar());
+    const updateData = () => {
+      setFitScale(coreService.get_capability_scalar());
+      setPrefScale(coreService.get_preference_scalar());
+    };
+
+    updateData();
+
+    const listener = () => updateData();
+    coreService.addListener(listener);
+    return () => {
+      coreService.removeListener(listener);
+    };
   }, [coreService]);
 
   const handleFitScaleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFitScale(parseFloat(e.target.value));
     const value = Math.max(0, parseFloat(e.target.value) || 0);
-    coreService.set_fit_scalar(value);
+    coreService.set_capability_scalar(value);
   };
 
   const handlePrefScaleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPrefScale(parseFloat(e.target.value));
     const value = Math.max(0, parseFloat(e.target.value) || 0);
-    coreService.set_pref_scalar(value);
+    coreService.set_preference_scalar(value);
   };
 
   const handleLoadBtn = () => {
@@ -82,7 +92,7 @@ function Toolbar() {
         )}
       </div>
       <label className="text-white font-bold" htmlFor="input1">
-        Fit Scale:
+        Capability Scale:
       </label>
       <input
         id="input1"
