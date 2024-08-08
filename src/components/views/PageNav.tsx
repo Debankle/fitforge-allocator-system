@@ -39,6 +39,7 @@ const Pagination: React.FC<PaginationProps> = ({
                 title={title} 
                 pairings={paginatedData}
                 sortBy={"team"}
+                itemsPerPage={9}
             />
         </TabPanel>
         ))}

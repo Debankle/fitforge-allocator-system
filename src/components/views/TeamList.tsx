@@ -47,6 +47,7 @@ const TeamList: React.FC<Props> = (props) => {
         title={`Pairings for project ${project}`}
         pairings={pairings}
         sortBy={"team"}
+        itemsPerPage={9}
       />
 
       {/*}
