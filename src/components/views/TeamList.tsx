@@ -38,14 +38,18 @@ const TeamList: React.FC<Props> = (props) => {
       >
         {Array.from({ length: numProjects }, (_, index) => (
           <option key={index + 1} value={index + 1}>
-            Project {index + 1}
+            Project {coreService.get_project_name(index + 1)}
           </option>
         ))}
       </select>
 
-      <ListView title={`Pairings for project ${project}`} pairings={pairings} sortBy={"team"} />
+      <ListView
+        title={`Pairings for project ${project}`}
+        pairings={pairings}
+        sortBy={"team"}
+      />
 
-        {/*}
+      {/*}
       <PageNav
         title={`Pairings for project ${project}`}
         pairings={pairings}

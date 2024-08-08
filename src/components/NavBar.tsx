@@ -25,11 +25,12 @@ function NavBar() {
     { label: "Rejections", page: "Rejections", data: null },
     { label: "Project List", page: "ProjectList", data: { team: 1 } },
     { label: "Team List", page: "TeamList", data: { project: 1 } },
-    {
-      label: "Pairing Test",
-      page: "PairingTest",
-      data: { team: 1, project: 1 },
-    },
+    { label: "Full List", page: "FullList", data: null},
+    // {
+    //   label: "Pairing Test",
+    //   page: "PairingTest",
+    //   data: { team: 1, project: 1 },
+    // },
   ];
 
   // #TODO: fix so this only swaps to valid tabs

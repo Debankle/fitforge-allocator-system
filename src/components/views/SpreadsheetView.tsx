@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCoreService } from "../../CoreServiceContext";
 import PairingDiv from "../Pairing";
 import "./SpreadsheetView.css"; // Import the CSS file
+import { useNavigation } from "../../NavServiceContext";
 
 function SpreadsheetView({ team = 1, project = 1 }) {
   const coreService = useCoreService();
+  const { navigate } = useNavigation();
   const [isModalShown, setIsModalShown] = useState<boolean>(false);
   const [spreadsheetData, setSpreadsheetData] = useState<number[][]>(
     coreService.get_b_values()
@@ -53,7 +55,7 @@ function SpreadsheetView({ team = 1, project = 1 }) {
     }
   };
 
-  scrollToCell(team,project);
+  scrollToCell(team, project);
 
   return (
     <div className="spreadsheet-container">
@@ -62,8 +64,17 @@ function SpreadsheetView({ team = 1, project = 1 }) {
           <tr>
             <th className="sticky-header">Team/Project</th>
             {Array.from({ length: numProjects || 0 }, (_, projectIndex) => (
-              <th key={projectIndex + 1} className="sticky-header">
-                Project {projectIndex + 1}
+              <th
+                key={projectIndex + 1}
+                className="sticky-header"
+                onClick={() =>
+                  navigate({
+                    page: "TeamList",
+                    data: { project: projectIndex + 1 },
+                  })
+                }
+              >
+                {coreService.get_project_name(projectIndex + 1)}
               </th>
             ))}
           </tr>
@@ -71,14 +82,24 @@ function SpreadsheetView({ team = 1, project = 1 }) {
         <tbody>
           {Array.from({ length: numTeams }, (_, teamIndex) => (
             <tr key={teamIndex + 1}>
-              <td className="sticky-cell">Team {teamIndex + 1}</td>
+              <td
+                className="sticky-cell"
+                onClick={() =>
+                  navigate({
+                    page: "ProjectList",
+                    data: { team: teamIndex + 1 },
+                  })
+                }
+              >
+                {coreService.get_team_name(teamIndex + 1)}
+              </td>
               {Array.from({ length: numProjects }, (_, projectIndex) => {
                 const cellKey = `${teamIndex + 1}-${projectIndex + 1}`;
                 return (
                   <td
                     key={cellKey}
                     ref={(el) => {
-                        if (el) cellRefs.current.set(cellKey,el);
+                      if (el) cellRefs.current.set(cellKey, el);
                     }}
                     style={{
                       backgroundColor: coreService.get_cell_bg_colour(

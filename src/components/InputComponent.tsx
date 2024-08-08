@@ -72,10 +72,17 @@ function InputComponent() {
   const loadData = () => {
     if (files.length !== 0) {
       setProcessing(true);
-      const promises: Promise<{ data: number[][]; tag: string }>[] = [];
+      const promises: Promise<{
+        data: number[][];
+        tag: string;
+        teamNames: string[];
+        projectNames: string[];
+      }>[] = [];
       let impact: number[][] = [];
       let capability: number[][] = [];
       let preference: number[][] = [];
+      let allTeamNames: string[] = [];
+      let allProjectNames: string[] = [];
 
       files.forEach((file) => {
         const fileName = file.name;
@@ -91,9 +98,11 @@ function InputComponent() {
       });
 
       Promise.all(promises).then((results) => {
-        results.forEach(({ data, tag }) => {
+        results.forEach(({ data, tag, teamNames, projectNames }) => {
           if (tag === "Impact") {
             impact.push(...data);
+            allTeamNames = teamNames;
+            allProjectNames = projectNames;
           } else if (tag === "Capability") {
             capability.push(...data);
           } else if (tag === "Preference") {
@@ -105,6 +114,8 @@ function InputComponent() {
           impact_vals: impact,
           capability_vals: capability,
           preference_vals: preference,
+          team_names: allTeamNames,
+          project_names: allProjectNames,
         };
 
         coreService.initialise_values(setupParams);
@@ -118,23 +129,36 @@ function InputComponent() {
     sheet: File,
     sheetName: string,
     tag: string
-  ): Promise<{ data: number[][]; tag: string }> => {
+  ): Promise<{
+    data: number[][];
+    tag: string;
+    teamNames: string[];
+    projectNames: string[];
+  }> => {
     return new Promise((resolve, reject) => {
       readXlsxFile(sheet, { sheet: sheetName })
         .then((rows) => {
           const dataArray: number[][] = [];
+          const teamNames: string[] = [];
+          const projectNames: string[] = [];
           // const colIndex = tag === "Impact" ? 2 : 1;
           const colIndex = 2;
+          projectNames.push(...(rows[0].slice(2) as string[]));
+
           for (let i = 1; i < rows.length; i++) {
+            teamNames.push(rows[i][0] as string);
             dataArray[i - 1] = [];
             for (let j = colIndex; j < rows[0].length; j++) {
-              const cellValue = rows[i][j];
+              let cellValue = rows[i][j];
+              if (Number.isNaN(cellValue)) {
+                cellValue = 0;
+              }
               if (typeof cellValue == "number") {
                 dataArray[i - 1][j - colIndex] = cellValue;
               }
             }
           }
-          resolve({ data: dataArray, tag });
+          resolve({ data: dataArray, tag, teamNames, projectNames });
         })
         .catch((error) => {
           console.error("Error reading sheet: ", error);

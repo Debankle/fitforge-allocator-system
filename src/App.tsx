@@ -13,6 +13,7 @@ import TeamsToProjects from "./components/views/TeamsToProjects";
 import PairingDiv from "./components/Pairing";
 import { useNavigation } from "./NavServiceContext";
 import "./App.css"; // Import your CSS file
+import FullList from "./components/views/FullList";
 
 function App() {
   const coreService = useCoreService();
@@ -33,7 +34,12 @@ function App() {
       case "Algorithm":
         return <Algorithm />;
       case "Spreadsheet":
-        return <SpreadsheetView team={currentPage.data.team} project={currentPage.data.project}/>;
+        return (
+          <SpreadsheetView
+            team={currentPage.data.team}
+            project={currentPage.data.project}
+          />
+        );
       case "Allocations":
         return <Allocations />;
       case "Rejections":
@@ -42,6 +48,8 @@ function App() {
         return <ProjectList team={currentPage.data.team} />;
       case "TeamList":
         return <TeamList project={currentPage.data.project} />;
+      case "FullList":
+        return <FullList />;
       case "PairingTest":
         return (
           <PairingDiv

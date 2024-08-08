@@ -16,6 +16,7 @@ function Allocations() {
         title={"Allocated Pairings"}
         pairings={coreSerivce.get_allocations()}
         sortBy={"team"}
+        itemsPerPage={9}
       />
     </div>
   );

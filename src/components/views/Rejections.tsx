@@ -14,6 +14,7 @@ function Rejections() {
           title={"Rejected Pairings"}
           pairings={rejection}
           sortBy={"team"}
+          itemsPerPage={9}
         />
       )}
     </div>
