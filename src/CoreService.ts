@@ -1,5 +1,12 @@
 import ILPAllocator from "./algorithms/ILP";
-import { Setup, State, Pairing, AllocationSet, InputStage } from "./interfaces";
+import {
+  Setup,
+  State,
+  Pairing,
+  AllocationSet,
+  InputStage,
+  AllocationResult,
+} from "./interfaces";
 import StateSaver from "./StateIO";
 import { runGaleShapley } from "./algorithms/GS"; // Import the Gale-Shapley function
 
@@ -8,6 +15,8 @@ class CoreService {
   private initial_impact: number[][] = [[]];
   private initial_capability: number[][] = [[]];
   private initial_preference: number[][] = [[]];
+  private team_names: string[] = [];
+  private project_names: string[] = [];
 
   private impact: number[][] = [[]];
   private capability: number[][] = [[]];
@@ -35,6 +44,8 @@ class CoreService {
     this.initial_impact = props.impact_vals;
     this.initial_capability = props.capability_vals;
     this.initial_preference = props.preference_vals;
+    this.team_names = props.team_names;
+    this.project_names = props.project_names;
     this.soft_reset();
   }
 
@@ -88,16 +99,34 @@ class CoreService {
   }
 
   // Data access functions
+  get_team_name(team: number) {
+    return this.team_names[team - 1];
+  }
+
+  get_project_name(project: number) {
+    return this.project_names[project - 1];
+  }
+
   get_score(): number {
     let score = 0;
-    for (const allocation in this.allocations) {
-      const project = parseInt(allocation[1]) - 1;
-      if (project == 0)
-        score +=
-          this.b[parseInt(allocation[0]) - 1][parseInt(allocation[1]) - 1];
+    for (let i = 0; i < this.allocations.length; i++) {
+      const inner_array = this.allocations[i];
+      if (inner_array[1] != 0) {
+        score += this.b[inner_array[0] - 1][inner_array[1] - 1];
+      }
     }
     return score;
   }
+
+  get_score_set(pairings: number[][]): number {
+    let score = 0;
+    for (let i = 0; i < pairings.length; i++) {
+      const pairing = pairings[i];
+      score += this.b[pairing[0] - 1][pairing[1] - 1];
+    }
+    return score;
+  }
+
   get_num_teams(): number {
     return this.num_teams;
   }
@@ -214,6 +243,7 @@ class CoreService {
     capability: number
   ): void {
     this.capability[team - 1][project - 1] = capability;
+    this.calculate_b_values();
   }
 
   set_preference_value(
@@ -222,10 +252,12 @@ class CoreService {
     preference: number
   ): void {
     this.preference[team - 1][project - 1] = preference;
+    this.calculate_b_values();
   }
 
   set_impact_value(team: number, project: number, impact: number): void {
-    this.impact[team - 1][project - 1];
+    this.impact[team - 1][project - 1] = impact;
+    this.calculate_b_values();
   }
 
   get_num_teams_to_projects(): number[] {
@@ -238,73 +270,112 @@ class CoreService {
 
   // Allocation functions
   is_pairing_allocated(team: number, project: number): boolean {
-    if (this.allocations[team - 1][1] == project) return true;
-    return false;
+    return this.allocations[team - 1][1] === project;
   }
 
   is_pairing_rejected(team: number, project: number): boolean {
-    if (
-      this.rejections.some((row) =>
-        row.every((value, index) => value === [team, project][index])
-      )
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    return this.rejections.some((row) =>
+      row.every((value, index) => value === [team, project][index])
+    );
   }
 
-  set_allocation(team: number, project: number): boolean {
+  set_allocation(team: number, project: number): AllocationResult {
     if (this.is_pairing_rejected(team, project)) {
-      console.log("pairing is already rejected");
-      return false;
+      return {
+        success: false,
+        message: "Pairing is already rejected. Cannot allocate.",
+      };
     }
-    if (!this.is_pairing_allocated(team, project)) {
-      if (
-        this.allocations.filter((row) => row[1] === project).length <
-        this.num_teams_to_project[project - 1]
-      ) {
-        this.allocations[team - 1][1] = project;
-        return true;
-      } else {
-        console.log("too many teams allocated to that project already");
-        return false;
-      }
-    } else {
-      console.log("team already has a project allocated");
-      return false;
+
+    const currentAllocation = this.allocations[team - 1][1];
+    if (currentAllocation === project) {
+      return {
+        success: true,
+        message: "Team is already allocated to this project.",
+      };
     }
+
+    const projectCapacity = this.num_teams_to_project[project - 1];
+    const currentProjectAllocations = this.allocations.filter(
+      (row) => row[1] === project
+    ).length;
+
+    if (currentProjectAllocations >= projectCapacity) {
+      return {
+        success: false,
+        message: "Project is at maximum capacity. Cannot allocate.",
+      };
+    }
+
+    if (currentAllocation !== 0) {
+      // Switching allocation
+      this.allocations[team - 1][1] = project;
+      return {
+        success: true,
+        message: "Allocation switched successfully.",
+        warning: `Team was switched from project ${currentAllocation} to project ${project}.`,
+      };
+    }
+
+    this.allocations[team - 1][1] = project;
+    return {
+      success: true,
+      message: "Project allocated successfully.",
+    };
   }
 
-  remove_allocation(team: number, project: number): boolean {
+  remove_allocation(team: number, project: number): AllocationResult {
     if (this.is_pairing_allocated(team, project)) {
       this.allocations[team - 1][1] = 0;
-      return true;
+      return {
+        success: true,
+        message: "Allocation removed successfully.",
+      };
     } else {
-      console.log("pairing not allocated");
-      return false;
+      return {
+        success: false,
+        message: "Pairing not allocated.",
+      };
     }
   }
 
-  set_rejection(team: number, project: number): boolean {
-    if (this.allocations[team - 1][1] != project) {
+  set_rejection(team: number, project: number): AllocationResult {
+    if (this.allocations[team - 1][1] === project) {
+      return {
+        success: false,
+        message: "Pairing is already allocated. Cannot reject.",
+      };
+    }
+
+    if (!this.is_pairing_rejected(team, project)) {
       this.rejections.push([team, project]);
-      return true;
+      return {
+        success: true,
+        message: "Project rejected successfully.",
+      };
     } else {
-      console.log("pairing is already allocated");
-      return false;
+      return {
+        success: false,
+        message: "Pairing already rejected.",
+      };
     }
   }
 
-  remove_rejection(team: number, project: number): boolean {
+  remove_rejection(team: number, project: number): AllocationResult {
     const index = this.rejections.findIndex(
       (row) => row[0] == team && row[1] == project
     );
     if (index !== -1) {
       this.rejections.splice(index, 1);
-      return true;
+      return {
+        success: true,
+        message: "Rejection removed successfully.",
+      };
     } else {
-      return false;
+      return {
+        success: false,
+        message: "Pairing not rejected.",
+      };
     }
   }
 
@@ -333,7 +404,7 @@ class CoreService {
         }
         const allocation: AllocationSet = {
           allocation: allocations,
-          score: alloc_set["result"] as number,
+          score: this.get_score_set(allocations),
           algorithm: "ILP",
           runCount: this.allocation_sets.length + 1,
         };
@@ -385,7 +456,7 @@ class CoreService {
     this.listeners.delete(listener);
   }
 
-  private notifyListeners(): void {
+  notifyListeners(): void {
     this.listeners.forEach((listener) => listener());
   }
 
@@ -395,6 +466,8 @@ class CoreService {
       initial_impact: this.initial_impact,
       initial_capability: this.initial_capability,
       initial_preference: this.initial_preference,
+      team_names: this.team_names,
+      project_names: this.project_names,
       impact: this.impact,
       capability: this.capability,
       preference: this.preference,
@@ -414,6 +487,8 @@ class CoreService {
     this.initial_impact = newState.initial_impact;
     this.initial_capability = newState.initial_capability;
     this.initial_preference = newState.initial_preference;
+    this.team_names = newState.team_names;
+    this.project_names = newState.project_names;
     this.impact = newState.impact;
     this.capability = newState.capability;
     this.preference = newState.preference;
@@ -432,6 +507,8 @@ class CoreService {
     console.log("Initial Impact:", this.initial_impact);
     console.log("Initial Capability:", this.initial_capability);
     console.log("Initial Preference:", this.initial_preference);
+    console.log("Team Names: ", this.team_names);
+    console.log("Project Names: ", this.project_names);
     console.log("Impact:", this.impact);
     console.log("Capability:", this.capability);
     console.log("Preference:", this.preference);

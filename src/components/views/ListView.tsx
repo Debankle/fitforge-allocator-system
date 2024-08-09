@@ -9,6 +9,7 @@ interface ListProps {
   title: string;
   pairings: number[][];
   sortBy: keyof Pairing;
+  itemsPerPage: number;
 }
 
 function ListView(props: ListProps) {
@@ -18,7 +19,7 @@ function ListView(props: ListProps) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
   const [activePage, setActivePage] = useState<number>(0);
-  const itemsPerPage = 9;
+  const itemsPerPage = props.itemsPerPage;
 
   useEffect(() => {
     const fetchData = async () => {

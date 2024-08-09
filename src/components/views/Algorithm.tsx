@@ -35,8 +35,10 @@ function Algorithm() {
   }, [algorithmSets]);
 
   const handleSetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedSet = algorithmSets[parseInt(event.target.value)];
+    const selectedSetIndex = parseInt(event.target.value);
+    const selectedSet = algorithmSets[selectedSetIndex];
     setCurrentAlgorithmSet(selectedSet);
+    setCurrentAlgorithmSetIndex(selectedSetIndex);
   };
 
   const handleAlgorithmChange = (
@@ -50,7 +52,13 @@ function Algorithm() {
       <div>
         <select onChange={handleAlgorithmChange}>
           <option value="ILP">Integer Linear Programmig</option>
-          <option value="GS">Gale-Shapely Matching</option>
+          <option
+            value="GS"
+            disabled={true}
+            className="opacity-50 cursor-not-allowed"
+          >
+            Gale-Shapely Matching
+          </option>
         </select>
         <button onClick={handleAlgorithmRun}>Run</button>
         <select onChange={handleSetChange} value={currentAlgorithmSetIndex}>
@@ -67,6 +75,7 @@ function Algorithm() {
         title={"Algorithm Pairings"}
         pairings={currentAlgorithmSet.allocation}
         sortBy={"team"}
+        itemsPerPage={9}
       />
     </div>
   );

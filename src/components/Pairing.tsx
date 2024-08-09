@@ -1,7 +1,7 @@
 import { useId, useState, useEffect } from "react";
 import { useCoreService } from "../CoreServiceContext";
 import { useNavigation } from "../NavServiceContext";
-import { AllocationState, Pairing } from "../interfaces";
+import { AllocationState, Pairing, AllocationResult } from "../interfaces";
 
 interface Props {
   team: number;
@@ -19,7 +19,11 @@ function PairingDiv(props: Props) {
   const [mode, setMode] = useState<"Read" | "Edit">("Read");
   const [allocationStatus, setAllocationStatus] =
     useState<AllocationState>("Neither");
+  const [warning, setWarning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [capVal, setCapVal] = useState<number>(pairingData.capability);
+  const [prefVal, setPrefVal] = useState<number>(pairingData.preference);
+  const [impactVal, setImpactVal] = useState<number>(pairingData.impact);
   const idPrefix = useId();
 
   useEffect(() => {
@@ -32,6 +36,9 @@ function PairingDiv(props: Props) {
       } else {
         setAllocationStatus("Neither");
       }
+      setCapVal(pairingData.capability);
+      setPrefVal(pairingData.preference);
+      setImpactVal(pairingData.impact);
     };
 
     updateData();
@@ -46,46 +53,73 @@ function PairingDiv(props: Props) {
 
   const handleAllocationChange = (value: AllocationState) => {
     setError(null);
+    setWarning(null);
 
-    let success = false;
+    let result: AllocationResult = { success: false, message: "" };
 
     switch (value) {
       case "Neither":
         if (allocationStatus === "Allocated") {
-          success = coreService.remove_allocation(props.team, props.project);
+          result = coreService.remove_allocation(props.team, props.project);
         } else if (allocationStatus === "Rejected") {
-          success = coreService.remove_rejection(props.team, props.project);
+          result = coreService.remove_rejection(props.team, props.project);
         } else {
-          success = true;
+          result = { success: true, message: "No change needed." };
         }
         break;
 
       case "Allocated":
-        if (allocationStatus === "Neither") {
-          success = coreService.set_allocation(props.team, props.project);
-        } else if (allocationStatus === "Rejected") {
-          coreService.remove_rejection(props.team, props.project);
-          success = coreService.set_allocation(props.team, props.project);
+        if (allocationStatus === "Rejected") {
+          // Remove rejection first, then attempt allocation
+          const rejectionRemoval = coreService.remove_rejection(
+            props.team,
+            props.project
+          );
+          if (rejectionRemoval.success) {
+            result = coreService.set_allocation(props.team, props.project);
+          } else {
+            result = rejectionRemoval;
+          }
+        } else if (
+          allocationStatus === "Neither" ||
+          allocationStatus === "Allocated"
+        ) {
+          result = coreService.set_allocation(props.team, props.project);
         }
         break;
 
       case "Rejected":
-        if (allocationStatus === "Neither") {
-          success = coreService.set_rejection(props.team, props.project);
-        } else if (allocationStatus === "Allocated") {
-          coreService.remove_allocation(props.team, props.project);
-          success = coreService.set_rejection(props.team, props.project);
+        if (allocationStatus === "Allocated") {
+          // Remove allocation first, then set rejection
+          const allocationRemoval = coreService.remove_allocation(
+            props.team,
+            props.project
+          );
+          if (allocationRemoval.success) {
+            result = coreService.set_rejection(props.team, props.project);
+          } else {
+            result = allocationRemoval;
+          }
+        } else if (
+          allocationStatus === "Neither" ||
+          allocationStatus === "Rejected"
+        ) {
+          result = coreService.set_rejection(props.team, props.project);
         }
         break;
 
       default:
+        result = { success: false, message: "Invalid allocation state." };
         break;
     }
+    coreService.notifyListeners();
 
-    if (success) {
+    if (result.success) {
       setAllocationStatus(value);
+      setWarning(result.warning || null);
     } else {
-      setError("Failed to update allocation status. Please try again");
+      setError(result.message);
+      // Maintain the previous allocation status in case of failure
     }
   };
 
@@ -130,11 +164,15 @@ function PairingDiv(props: Props) {
       <div className="flex justify-between items-center mb-4">
         <div className="flex flex-col">
           <div className="font-bold text-xl">Team:</div>
-          <div className="text-2xl">{props.team}</div>
+          <div className="text-2xl">
+            {coreService.get_team_name(props.team)}
+          </div>
         </div>
         <div className="flex flex-col">
           <div className="font-bold text-xl">Project:</div>
-          <div className="text-2xl">{props.project}</div>
+          <div className="text-2xl">
+            {coreService.get_project_name(props.project)}
+          </div>
         </div>
       </div>
 
@@ -142,15 +180,75 @@ function PairingDiv(props: Props) {
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="flex flex-col">
           <div className="font-bold text-sm">Capability:</div>
-          <div>{formatNumber(pairingData.capability)}</div>
+          {mode == "Read" ? (
+            <div>{formatNumber(pairingData.capability)}</div>
+          ) : (
+            <input
+              type="number"
+              value={capVal}
+              step={"0.000001"}
+              className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setCapVal(value);
+                  coreService.set_capability_value(
+                    props.team,
+                    props.project,
+                    value
+                  );
+                }
+              }}
+            />
+          )}
         </div>
         <div className="flex flex-col">
           <div className="font-bold text-sm">Preference:</div>
-          <div>{formatNumber(pairingData.preference)}</div>
+          {mode == "Read" ? (
+            <div>{formatNumber(pairingData.preference)}</div>
+          ) : (
+            <input
+              type="number"
+              value={prefVal}
+              step={"0.000001"}
+              className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setPrefVal(value);
+                  coreService.set_preference_value(
+                    props.team,
+                    props.project,
+                    value
+                  );
+                }
+              }}
+            />
+          )}
         </div>
         <div className="flex flex-col">
           <div className="font-bold text-sm">Impact:</div>
-          <div>{formatNumber(pairingData.impact)}</div>
+          {mode == "Read" ? (
+            <div>{formatNumber(pairingData.impact)}</div>
+          ) : (
+            <input
+              type="number"
+              value={impactVal}
+              step={"0.000001"}
+              className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setImpactVal(value);
+                  coreService.set_impact_value(
+                    props.team,
+                    props.project,
+                    value
+                  );
+                }
+              }}
+            />
+          )}
         </div>
         <div className="flex flex-col">
           <div className="font-bold text-sm">Cap Scalar:</div>
@@ -210,6 +308,11 @@ function PairingDiv(props: Props) {
         </div>
       </div>
 
+      {/* Warning Message */}
+      {warning && (
+        <div className="text-black-500 text-center mb-4">{warning}</div>
+      )}
+
       {/* Error Message */}
       {error && <div className="text-black-500 text-center mb-4">{error}</div>}
 
@@ -243,8 +346,9 @@ function PairingDiv(props: Props) {
           Project {props.project} team list
         </button>
         <button
-          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 opacity-50 cursor-not-allowed"
           onClick={() => setMode(mode === "Edit" ? "Read" : "Edit")}
+          disabled={true}
         >
           {mode === "Edit" ? "Switch to Read" : "Switch to Edit"}
         </button>

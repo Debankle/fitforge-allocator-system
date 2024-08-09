@@ -9,7 +9,8 @@ type MenuItem = {
 };
 
 function NavBar() {
-  const { navigate, currentPage } = useNavigation();
+  const { navigate, currentPage, currentIndex, goForward, goBack } =
+    useNavigation();
 
   const menuItems: MenuItem[] = [
     { label: "Upload", page: "Upload", data: null },
@@ -24,11 +25,12 @@ function NavBar() {
     { label: "Rejections", page: "Rejections", data: null },
     { label: "Project List", page: "ProjectList", data: { team: 1 } },
     { label: "Team List", page: "TeamList", data: { project: 1 } },
-    {
-      label: "Pairing Test",
-      page: "PairingTest",
-      data: { team: 1, project: 1 },
-    },
+    { label: "Full List", page: "FullList", data: null},
+    // {
+    //   label: "Pairing Test",
+    //   page: "PairingTest",
+    //   data: { team: 1, project: 1 },
+    // },
   ];
 
   // #TODO: fix so this only swaps to valid tabs
@@ -49,6 +51,30 @@ function NavBar() {
             {item.label}
           </li>
         ))}
+        <li key={"back"}>
+          <button
+            className={`bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded shadow-md ${
+              currentIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={goBack}
+            disabled={currentIndex === 0}
+          >
+            Back
+          </button>
+        </li>
+        <li key={"forward"} onClick={() => goForward()}>
+          <button
+            className={`bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded shadow-md ${
+              currentIndex === history.length - 1
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+            onClick={goForward}
+            disabled={currentIndex === history.length - 1}
+          >
+            Forward
+          </button>
+        </li>
       </ul>
     </div>
   );

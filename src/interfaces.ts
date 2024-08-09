@@ -2,12 +2,16 @@ export interface Setup {
   impact_vals: number[][];
   capability_vals: number[][];
   preference_vals: number[][];
+  team_names: string[];
+  project_names: string[];
 }
 
 export interface State {
   initial_impact: number[][];
   initial_capability: number[][];
   initial_preference: number[][];
+  team_names: string[];
+  project_names: string[];
   impact: number[][];
   capability: number[][];
   preference: number[][];
@@ -47,6 +51,7 @@ export type NavPage =
   | "ProjectList"
   | "TeamList"
   | "Spreadsheet"
+  | "FullList"
   | "PairingTest";
 
 export type AllocationState = "Allocated" | "Rejected" | "Neither";
@@ -57,3 +62,9 @@ export interface PageView {
   page: NavPage;
   data: any;
 }
+
+export type AllocationResult = {
+  success: boolean;
+  message: string;
+  warning?: string;
+};
