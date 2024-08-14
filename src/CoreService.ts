@@ -461,7 +461,20 @@ class CoreService {
   }
 
   // Save methods
-  saveState(filename: string): void {
+  saveState(): void {
+    const generateFilename = (programName: string): string => {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+
+      return `${programName}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.ffas`;
+    };
+    const filename = generateFilename("FitForge");
+
     const currentState: State = {
       initial_impact: this.initial_impact,
       initial_capability: this.initial_capability,

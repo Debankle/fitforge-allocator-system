@@ -52,7 +52,7 @@ function Toolbar() {
   };
 
   const handleSaveBtn = () => {
-    coreService.saveState("saveState.ffas");
+    coreService.saveState();
   };
 
   const toggleDropdown = () => {

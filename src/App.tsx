@@ -19,47 +19,57 @@ function App() {
   const coreService = useCoreService();
   const { currentPage } = useNavigation();
   const [dataStage, setDataStage] = useState(coreService.dataStage);
+  document.title = "FitForge Allocator";
 
   useEffect(() => {
     setDataStage(coreService.dataStage);
   }, [currentPage]);
 
   const renderComponent = () => {
-    if (dataStage == "Stage1") return <InputComponent />;
-    switch (currentPage.page) {
-      case "Upload":
-        return <InputComponent />;
-      case "TeamsToProjects":
-        return <TeamsToProjects />;
-      case "Algorithm":
-        return <Algorithm />;
-      case "Spreadsheet":
-        return (
-          <SpreadsheetView
-            team={currentPage.data.team}
-            project={currentPage.data.project}
-          />
-        );
-      case "Allocations":
-        return <Allocations />;
-      case "Rejections":
-        return <Rejections />;
-      case "ProjectList":
-        return <ProjectList team={currentPage.data.team} />;
-      case "TeamList":
-        return <TeamList project={currentPage.data.project} />;
-      case "FullList":
-        return <FullList />;
-      case "PairingTest":
-        return (
-          <PairingDiv
-            team={currentPage.data.team}
-            project={currentPage.data.project}
-            onToggle={() => {}}
-          />
-        );
-      default:
-        return <InputComponent />;
+    try {
+      if (dataStage == "Stage1") return <InputComponent />;
+      switch (currentPage.page) {
+        case "Upload":
+          return <InputComponent />;
+        case "TeamsToProjects":
+          return <TeamsToProjects />;
+        case "Algorithm":
+          return <Algorithm />;
+        case "Spreadsheet":
+          return (
+            <SpreadsheetView
+              team={currentPage.data.team}
+              project={currentPage.data.project}
+            />
+          );
+        case "Allocations":
+          return <Allocations />;
+        case "Rejections":
+          return <Rejections />;
+        case "ProjectList":
+          return <ProjectList team={currentPage.data.team} />;
+        case "TeamList":
+          return <TeamList project={currentPage.data.project} />;
+        case "FullList":
+          return <FullList />;
+        case "PairingTest":
+          return (
+            <PairingDiv
+              team={currentPage.data.team}
+              project={currentPage.data.project}
+              onToggle={() => {}}
+            />
+          );
+        default:
+          return <InputComponent />;
+      }
+    } catch (e) {
+      coreService.saveState();
+      return (
+        <h1>
+          Something went wrong. Progress was saved, please reload the page
+        </h1>
+      );
     }
   };
 
