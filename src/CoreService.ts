@@ -269,6 +269,22 @@ class CoreService {
   }
 
   // Allocation functions
+  does_team_have_allocation(teamID: number) {
+    const teamAllocation = this.allocations.find(
+      ([team, project]) => team === teamID
+    );
+    return teamAllocation && (teamAllocation[1] !== 0);
+  }
+
+  does_project_have_allocation(projectID: number) {
+    const allocatedTeamsCount = this.allocations.filter(
+      ([team, project]) => project === projectID
+    ).length;
+    const maxTeamsForProject = this.num_teams_to_project[projectID - 1];
+
+    return allocatedTeamsCount >= maxTeamsForProject;
+  }
+
   is_pairing_allocated(team: number, project: number): boolean {
     return this.allocations[team - 1][1] === project;
   }

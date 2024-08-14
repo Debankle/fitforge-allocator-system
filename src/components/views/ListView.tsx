@@ -19,6 +19,8 @@ function ListView(props: ListProps) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
   const [activePage, setActivePage] = useState<number>(0);
+  const [badTeams, setBadTeams] = useState<boolean>(false);
+  const [badProjects, setBadProjects] = useState<boolean>(false);
   const itemsPerPage = props.itemsPerPage;
 
   useEffect(() => {
@@ -35,8 +37,22 @@ function ListView(props: ListProps) {
     fetchData();
   }, [props.pairings]);
 
-  // Sort the pairing data
-  const sortedPairingData = [...pairingData].sort((a, b) => {
+  const filteredPairingData = pairingData.filter(({ team, project }) => {
+    const teamAllocated = coreService.does_team_have_allocation(team);
+    const projectAllocated = coreService.does_project_have_allocation(project);
+
+    if (badTeams && badProjects) {
+      return !teamAllocated && !projectAllocated;
+    } else if (badTeams) {
+      return !teamAllocated;
+    } else if (badProjects) {
+      return !projectAllocated;
+    } else {
+      return true;
+    }
+  });
+
+  const sortedPairingData = [...filteredPairingData].sort((a, b) => {
     const compareA = a[sortProperty];
     const compareB = b[sortProperty];
     if (compareA < compareB) return sortOrder === "asc" ? -1 : 1;
@@ -76,6 +92,18 @@ function ListView(props: ListProps) {
         <option value="asc">Ascending</option>
         <option value="desc">Descending</option>
       </select>
+      <input
+        type="checkbox"
+        checked={badTeams}
+        onChange={() => setBadTeams(!badTeams)}
+      ></input>
+      <label>Show Remaining Teams Only</label>
+      <input
+        type="checkbox"
+        checked={badProjects}
+        onChange={() => setBadProjects(!badProjects)}
+      ></input>
+      <label>Show Remaining Projects Only</label>
 
       <Tabs
         selectedIndex={activePage}
