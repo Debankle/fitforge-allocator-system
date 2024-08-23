@@ -3,12 +3,26 @@ import { useCoreService } from "../CoreServiceContext";
 import { useNavigation } from "../NavServiceContext";
 import { AllocationState, Pairing, AllocationResult } from "../interfaces";
 
+/**
+ * Props for the PairingDiv component
+ * 
+ * @typedef {Object} Props
+ * @property {number} team
+ * @property {number} project
+ * @property {() => void} onToggle;
+ */
 interface Props {
   team: number;
   project: number;
   onToggle: () => void;
 }
 
+/**
+ * `PairingDiv` renders the pairing of a team and project, showing their details. It allows the user to switch to different views and changes background colour depending on the properties
+ * 
+ * @param {Props} props
+ * @returns {JSX.Element}
+ */
 function PairingDiv(props: Props) {
   const coreService = useCoreService();
   const { navigate } = useNavigation();
@@ -26,6 +40,9 @@ function PairingDiv(props: Props) {
   const [impactVal, setImpactVal] = useState<number>(pairingData.impact);
   const idPrefix = useId();
 
+  /**
+   * Fetches the pairing data from CoreService on update from listener
+   */
   useEffect(() => {
     const updateData = () => {
       setPairingData(coreService.get_pairing_data(props.team, props.project));
@@ -51,6 +68,9 @@ function PairingDiv(props: Props) {
     };
   }, [props.team, props.project, coreService]);
 
+  /**
+   * Handles change in the allocate/reject/neither radiobuttons
+   */
   const handleAllocationChange = (value: AllocationState) => {
     setError(null);
     setWarning(null);

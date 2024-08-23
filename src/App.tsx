@@ -12,9 +12,15 @@ import TeamList from "./components/views/TeamList";
 import TeamsToProjects from "./components/views/TeamsToProjects";
 import PairingDiv from "./components/Pairing";
 import { useNavigation } from "./NavServiceContext";
-import "./App.css"; // Import your CSS file
+import "./App.css";
 import FullList from "./components/views/FullList";
 
+/**
+ * `App` renders the main view of the webapp, switching the child element rendered in the
+ * body of the display with renderComponentr by taking updates from NavigationContext
+ *
+ * @returns {JSX.Element}
+ */
 function App() {
   const coreService = useCoreService();
   const { currentPage } = useNavigation();
