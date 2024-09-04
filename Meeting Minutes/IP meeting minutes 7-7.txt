@@ -1,0 +1,13 @@
+David was a little confused
+Lists all the units passed in terms of Software development, MobDev, UX, etv
+Online and internal and international listed as well
+Don’t want to put too many students with unknown quantities together as problems occur - no track record
+No groups of three
+When team has same level of impact then project gets assigned (David’s system)
+David showing his system:
+Has this ‘smarties looking visualization’ which shows team fit for projects - Looks very interesting 
+Realized had to write another version of viewer where the fits disappear after confirming allocation - took some time for him
+The allocation he had was good but realized that teams without good capability fit caused problems therefore his system proved difficult
+Discovered he allocated a team twice and one project twice accidentally - needs guard rails to prevent him from allocating mindlessly
+Definitely needs a manual allocation system to make teams happy
+Don’t hold Davids hand through going through the allocation system so that we have useful data and a good artifact for our report: next week 9-11:30am

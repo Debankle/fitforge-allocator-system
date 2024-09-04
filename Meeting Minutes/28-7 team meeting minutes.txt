@@ -1,0 +1,23 @@
+Sunday 28/7/24 Team Meeting 11am
+
+Attendees:
+Oliver Pinel
+Calum Ingram
+Raphael Fahey
+
+Agenda:
+Testing on Thursday preparation
+Tutor meeting on Wednesday preparation
+
+Minutes:
+Check of progress on assigned tasks
+- no one done but making progress
+- all coding work done by Tuesday, give Oliver Wednesday to fix up anything before testing on Thursday
+Covered all the implementation we want to
+Oliver will go in to host laptop webserver - recorded
+Tutor meeting
+- overview of the required documents
+- some done
+- still need IP meeting minutes, risk assessment
+- sprint plan has been thrown out
+- team agreement draft submitted, will be confirmed or modified on wednesday

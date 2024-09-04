@@ -8,8 +8,14 @@ import {
   AllocationResult,
 } from "./interfaces";
 import StateSaver from "./StateIO";
-import { runGaleShapley } from "./algorithms/GS"; // Import the Gale-Shapley function
+import { runGaleShapley } from "./algorithms/GS";
 
+/**
+ * Backend data management context class
+ * 
+ * @class
+
+ */
 class CoreService {
   // Private Properties
   private initial_impact: number[][] = [[]];
@@ -39,7 +45,13 @@ class CoreService {
   public dataStage: InputStage = "Stage1";
   private listeners: Set<() => void> = new Set();
 
-  // Setup functions
+  /**
+   * Initial input of base allocation data
+   *
+   * @public
+   * @param {Setup} props - The initial data
+   * @returns {void}
+   */
   initialise_values(props: Setup): void {
     this.initial_impact = props.impact_vals;
     this.initial_capability = props.capability_vals;
@@ -49,6 +61,12 @@ class CoreService {
     this.soft_reset();
   }
 
+  /**
+   * Hard reset of the system, wiping all data and returning to initial input stage
+   *
+   * @public
+   * @returns {void}
+   */
   hard_reset(): void {
     this.initial_impact = [[]];
     this.initial_capability = [[]];
@@ -57,6 +75,12 @@ class CoreService {
     this.dataStage = "Stage1";
   }
 
+  /**
+   * Soft reset of the system back to the original state after uploading the data initially
+   *
+   * @public
+   * @returns {void}
+   */
   soft_reset(): void {
     this.impact = this.initial_impact;
     this.capability = this.initial_capability;
@@ -74,6 +98,14 @@ class CoreService {
     this.dataStage = "Stage2";
   }
 
+  /**
+   * Calculates the b values based on the uploaded data according to the formula
+   * b_ij = impact_ij * (cap_scale * capability_ij + pref_scale * preference_ij)
+   * for every pairing team i project j
+   *
+   * @private
+   * @returns {void}
+   */
   calculate_b_values(): void {
     this.min = Infinity;
     this.max = -Infinity;
@@ -92,21 +124,46 @@ class CoreService {
     this.notifyListeners();
   }
 
+  /**
+   * Set the initial allocation pairings to zero (null)
+   *
+   * @private
+   * @returns {void}
+   */
   set_initial_allocations(): void {
     for (let i = 1; i <= this.num_teams; i++) {
       this.allocations[i - 1] = [i, 0];
     }
   }
 
-  // Data access functions
-  get_team_name(team: number) {
+  /**
+   * Return the visible team name for the team number
+   *
+   * @public
+   * @param {number} team - team number from 1 to m
+   * @returns {string} The visible name for team i
+   */
+  get_team_name(team: number): string {
     return this.team_names[team - 1];
   }
 
-  get_project_name(project: number) {
+  /**
+   * Return the visible project name for the project number
+   *
+   * @public
+   * @param {number} project - project number from 1 to n
+   * @returns {string} The visible name for project j
+   */
+  get_project_name(project: number): string {
     return this.project_names[project - 1];
   }
 
+  /**
+   * Get the score of the current allocation, i.e. the sum of the b values
+   *
+   * @public
+   * @returns {number} The total score of the allocations
+   */
   get_score(): number {
     let score = 0;
     for (let i = 0; i < this.allocations.length; i++) {
@@ -118,6 +175,13 @@ class CoreService {
     return score;
   }
 
+  /**
+   * Calculate the score for an allocation set
+   *
+   * @public
+   * @param {number[][]} pairings - a 2D array of team project pairings
+   * @returns {number} The sum of b values for each pairing
+   */
   get_score_set(pairings: number[][]): number {
     let score = 0;
     for (let i = 0; i < pairings.length; i++) {
@@ -127,23 +191,61 @@ class CoreService {
     return score;
   }
 
+  /**
+   * Get the number of teams in the current state
+   *
+   * @public
+   * @returns {number} The number of teams in the system
+   */
   get_num_teams(): number {
     return this.num_teams;
   }
 
+  /**
+   * Get the number of projects in the current state
+   *
+   * @public
+   * @returns {number} The number of projects in the system
+   */
   get_num_projects(): number {
     return this.num_projects;
   }
 
+  /**
+   * Get the b value for a specific pairing ij
+   *
+   * @public
+   * @param {number} team - the team number i from 1 to m
+   * @param {number} project - the project number j from 1 to n
+   * @returns {number} The b value for pairing ij
+   */
   get_b_value(team: number, project: number): number {
     // Expects team from 1 to num_teams, and project from 1 to num_projects
     return this.b[team - 1][project - 1];
   }
 
+  /**
+   * Return the b value matrix
+   *
+   * @public
+   * @returns {number[][]} The current b values stored
+   */
   get_b_values(): number[][] {
     return this.b;
   }
 
+  /**
+   * Get the Pairing details for a specific pairing ij.
+   *
+   * If the team and number parameters are within the range, will return their pairing data
+   * If the pairing is an unallocated team, it will return -1 for each datapoint
+   * If the pairing is invalid, it will return 0 for each datapoint
+   *
+   * @public
+   * @param {number} team - the team number i from 1 to m
+   * @param {number} project - the project number j from 1 to n
+   * @returns {Pairing} The Pairing object containing the data for that specific pairing
+   */
   get_pairing_data(team: number, project: number): Pairing {
     if (team >= 1 && project == 0 && team <= this.num_teams) {
       return {
@@ -185,6 +287,14 @@ class CoreService {
     };
   }
 
+  /**
+   * Get the background colour for a pairing div based on the b value scale
+   *
+   * @public
+   * @param {number} bvalue - the b value of the pairing
+   * @param {number} alpha - the alpha level for the background
+   * @returns {string} The rgba string for a background
+   */
   get_bg_colour(bvalue: number, alpha: number = 1): string {
     if (bvalue === -1) {
       return `rgba(0,0,180,${alpha})`;
@@ -195,6 +305,14 @@ class CoreService {
     return `rgba(${red},${green},0,${alpha})`;
   }
 
+  /**
+   * Get the background colour for the spreadsheet cells based on its allocation status and b value
+   *
+   * @public
+   * @param {number} team - team i from 1 to m
+   * @param {number} project - project j from 1 to n
+   * @returns {string} The rgba string for a background
+   */
   get_cell_bg_colour(team: number, project: number): string {
     if (this.is_pairing_allocated(team, project)) {
       return "rgba(51,153,255,0.7)";
@@ -207,36 +325,88 @@ class CoreService {
     }
   }
 
+  /**
+   * Set the capability scalar value and update the b values
+   *
+   * @public
+   * @param {number} capability - the scalar value for capability
+   * @returns {void}
+   */
   set_capability_scalar(capability: number): void {
     this.capability_scalar = capability;
     this.calculate_b_values();
   }
 
+  /**
+   * Set the preference scalar value and update the b values
+   *
+   * @public
+   * @param {number} preference - the scalar value for preference
+   * @returns {void}
+   */
   set_preference_scalar(preference: number): void {
     this.preference_scalar = preference;
     this.calculate_b_values();
   }
 
+  /**
+   * Get the capability scalar value
+   *
+   * @public
+   * @returns {number} The current capability scalar value
+   */
   get_capability_scalar(): number {
     return this.capability_scalar;
   }
 
+  /**
+   * Get the preference scalar value
+   *
+   * @public
+   * @returns {number} The current preference scalar values
+   */
   get_preference_scalar(): number {
     return this.preference_scalar;
   }
 
+  /**
+   * Get the current allocations
+   *
+   * @public
+   * @returns {number[][]} The current allocations
+   */
   get_allocations(): number[][] {
     return this.allocations;
   }
 
+  /**
+   * Get the current rejections
+   *
+   * @public
+   * @returns {number[][]} The current rejections
+   */
   get_rejections(): number[][] {
     return this.rejections;
   }
 
+  /**
+   * Get all of the allocation sets generate
+   *
+   * @public
+   * @returns {AllocationSet[]} The list of all AllocationSets stored
+   */
   get_allocation_sets(): AllocationSet[] {
     return this.allocation_sets;
   }
 
+  /**
+   * Set the capability value for a specific pairing
+   *
+   * @public
+   * @param {number} team - the team i from 1 to m
+   * @param {number} project - the project j from 1 to n
+   * @param {number} capability - the new capability value
+   */
   set_capability_value(
     team: number,
     project: number,
@@ -246,6 +416,14 @@ class CoreService {
     this.calculate_b_values();
   }
 
+  /**
+   * Set the preference value for a specific pairing
+   *
+   * @public
+   * @param {number} team - the team i from 1 to m
+   * @param {number} project - the project j from 1 to n
+   * @param {number} preference - the new preference value
+   */
   set_preference_value(
     team: number,
     project: number,
@@ -255,30 +433,104 @@ class CoreService {
     this.calculate_b_values();
   }
 
+  /**
+   * Set the impact value for a specific pairing
+   *
+   * @public
+   * @param {number} team - the team i from 1 to m
+   * @param {number} project - the project j from 1 to n
+   * @param {number} impact - the new impact value
+   */
   set_impact_value(team: number, project: number, impact: number): void {
     this.impact[team - 1][project - 1] = impact;
     this.calculate_b_values();
   }
 
+  /**
+   * Get the number of teams each project can be allocated to
+   *
+   * @public
+   * @returns {number[]} The number of teams each project can take, defaults to 1
+   */
   get_num_teams_to_projects(): number[] {
     return this.num_teams_to_project;
   }
 
+  /**
+   * Set the number of teams project j can take
+   *
+   * @public
+   * @param {number} teams - the number of teams the project can take
+   * @param {number} project - the project j from 1 to n
+   */
   set_num_teams_to_project(teams: number, project: number): void {
     this.num_teams_to_project[project - 1] = teams;
   }
 
-  // Allocation functions
+  /**
+   * Checks whether a team has an allocation
+   *
+   * @public
+   * @param {number} teamID - the team counter number i from 1 to m
+   * @returns {boolean} True if the team has an allocation, false otherwise
+   */
+  does_team_have_allocation(teamID: number): boolean | undefined {
+    const teamAllocation = this.allocations.find(
+      ([team, project]) => team === teamID
+    );
+    return teamAllocation && teamAllocation[1] !== 0;
+  }
+
+  /**
+   * Checks whether the project is at maximum amounts of allocations
+   *
+   * @public
+   * @param {number} projectID - the project counter number j from 1 to n
+   * @returns {boolean} Whether the project can be allocated to another team
+   */
+  does_project_have_allocation(projectID: number): boolean {
+    const allocatedTeamsCount = this.allocations.filter(
+      ([team, project]) => project === projectID
+    ).length;
+    const maxTeamsForProject = this.num_teams_to_project[projectID - 1];
+
+    return allocatedTeamsCount >= maxTeamsForProject;
+  }
+
+  /**
+   * Checks whether a specific pairing ij is allocated
+   *
+   * @public
+   * @param {number} team - team counter i from 1 to m
+   * @param {number} project - project counter j from 1 to n
+   * @returns {boolean} Whether the pairing ij is allocated
+   */
   is_pairing_allocated(team: number, project: number): boolean {
     return this.allocations[team - 1][1] === project;
   }
 
+  /**
+   * Checks whether a specific pairing ij is rejected
+   *
+   * @public
+   * @param {number} team - team counter i from 1 to m
+   * @param {number} project - project counter j from 1 to n
+   * @returns {boolean} Whether the pairing ij is rejected
+   */
   is_pairing_rejected(team: number, project: number): boolean {
     return this.rejections.some((row) =>
       row.every((value, index) => value === [team, project][index])
     );
   }
 
+  /**
+   * Attempts to set a pairing allocation
+   *
+   * @public
+   * @param {number} team - team counter i from 1 to m
+   * @param {number} project - project counter j from 1 to n
+   * @returns {AllocationResult} The result of attempting to make the allocation
+   */
   set_allocation(team: number, project: number): AllocationResult {
     if (this.is_pairing_rejected(team, project)) {
       return {
@@ -324,6 +576,14 @@ class CoreService {
     };
   }
 
+  /**
+   * Attempts to remove an allocation
+   *
+   * @public
+   * @param {number} team - team counter i from 1 to m
+   * @param {number} project - project counter j from 1 to n
+   * @returns {AllocationResult} The result of attempting to make the allocation
+   */
   remove_allocation(team: number, project: number): AllocationResult {
     if (this.is_pairing_allocated(team, project)) {
       this.allocations[team - 1][1] = 0;
@@ -339,6 +599,14 @@ class CoreService {
     }
   }
 
+  /**
+   * Attempts to reject a pairing
+   *
+   * @public
+   * @param {number} team - team counter i from 1 to m
+   * @param {number} project - project counter j from 1 to n
+   * @returns {AllocationResult} The result of attempting to make the rejection
+   */
   set_rejection(team: number, project: number): AllocationResult {
     if (this.allocations[team - 1][1] === project) {
       return {
@@ -361,6 +629,14 @@ class CoreService {
     }
   }
 
+  /**
+   * Attempts to remove a rejected pairing
+   *
+   * @public
+   * @param {number} team - team counter i from 1 to m
+   * @param {number} project - project counter j from 1 to n
+   * @returns {AllocationResult} The result of attempting to make the rejection
+   */
   remove_rejection(team: number, project: number): AllocationResult {
     const index = this.rejections.findIndex(
       (row) => row[0] == team && row[1] == project
@@ -379,7 +655,12 @@ class CoreService {
     }
   }
 
-  // Algorithms
+  /**
+   * Runs the algorithm to produce an optimal allocation set
+   * 
+   * @public
+   * @param {string} algorithm - an identifier to specify a specific algorithm
+   */
   run_algorithm(algorithm: string): void {
     if (algorithm == "ILP") {
       const alloc_set = ILPAllocator(
@@ -437,6 +718,13 @@ class CoreService {
     }
   }
 
+  /**
+   * Calculates the score based on the pairings from an allocation set
+   * 
+   * @public
+   * @param {number[][]} allocation_set - the allocation set a score should be calculate for
+   * @returns {number} The score of the allocation set
+   */
   private calculateScoreFromAllocation(allocation_set: number[][]): number {
     let score = 0;
     for (let teamIndex = 0; teamIndex < allocation_set.length; teamIndex++) {
@@ -447,21 +735,54 @@ class CoreService {
     return score;
   }
 
-  // Connection to listeners
+  /**
+   * Add a listener function that can be updated on data change
+   * 
+   * @public
+   * @param {() => void} listener - a function that will be called on change
+   */
   addListener(listener: () => void): void {
     this.listeners.add(listener);
   }
 
+  /**
+   * Removes a listener function from the listeners set
+   * 
+   * @public
+   * @param {() => void} listener - the function to be removed
+   */
   removeListener(listener: () => void): void {
     this.listeners.delete(listener);
   }
 
+  /**
+   * Calls all listeners, to update them on data changes
+   * 
+   * @public
+   */
   notifyListeners(): void {
     this.listeners.forEach((listener) => listener());
   }
 
-  // Save methods
-  saveState(filename: string): void {
+  /**
+   * Save the current state of the program in a local file on the pc
+   * 
+   * @public
+   */
+  saveState(): void {
+    const generateFilename = (programName: string): string => {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+
+      return `${programName}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.ffas`;
+    };
+    const filename = generateFilename("FitForge");
+
     const currentState: State = {
       initial_impact: this.initial_impact,
       initial_capability: this.initial_capability,
@@ -482,6 +803,14 @@ class CoreService {
     StateSaver.save(filename, currentState);
   }
 
+  /**
+   * Loads a save state from a specified file
+   * 
+   * @async
+   * @public
+   * @param {File} file - the file to read the save state from
+   * @returns {Promise<void>} returns nothing async
+   */
   async loadState(file: File): Promise<void> {
     const newState = await StateSaver.load(file);
     this.initial_impact = newState.initial_impact;

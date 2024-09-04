@@ -1,6 +1,11 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useCoreService } from "../CoreServiceContext";
 
+/**
+ * `Toolbar` renders the top bar of the webapp providing functional buttons and configuration options
+ * 
+ * @returns {JSX.Element}
+ */
 function Toolbar() {
   const [fitScale, setFitScale] = useState<number>(1);
   const [prefScale, setPrefScale] = useState<number>(1);
@@ -52,7 +57,7 @@ function Toolbar() {
   };
 
   const handleSaveBtn = () => {
-    coreService.saveState("saveState.ffas");
+    coreService.saveState();
   };
 
   const toggleDropdown = () => {
