@@ -1,0 +1,33 @@
+Wednesday 24/7/24 Team Meeting 7pm
+
+Attendees:
+Alex
+Oliver
+Raphael
+Calum
+
+Minutes:
+sent approval to industry partner for work agreement contract
+sent industry partner feedback form for our meeting today
+Summarised meeting to member who missed it
+- lacking minutes because we forgot and can't get the recording
+
+Team meeting set on 10am sunday to finish tutor prep and last touches
+
+discusses stuff that needs to be done
+
+Raphael
+- make the spreadsheet workable by fixing the css
+
+Calum
+- list view tabs and multiple columns
+
+Alex 
+- algorithm
+- input handle data properly and num teams to projects with input field
+
+Oliver
+- input handle data properly
+- editing data
+- navigation
+- error handling

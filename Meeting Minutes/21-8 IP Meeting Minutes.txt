@@ -1,0 +1,9 @@
+Students with the least capability fit are given something they can manage - teams aren’t put in an impossible situation
+Teams with low levels of capability aren’t going to provide much benefit
+Metric needs to be adjusted - maybe instead of having benefit on a linear scale, maybe could be done in proportion to the maximum benefit a group could receive
+What’s valuable is the discussion haven now and analysis of the kinds of issues we were seeing - critical analysis and reflection, sparking new ideas
+David mentioned an interesting idea in the video that could be worth trying
+David cares more about the actual process and our reflections
+New objective function where each team benefit is normalised by the maximum benefit they would get
+In write up, a condensed, navigable, and easily defined report is the best method for the report as it’s easy for anyone to pick up
+Good references/sources for guidance will help the report add merit
