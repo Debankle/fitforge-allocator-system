@@ -24,8 +24,8 @@ jobs:
 
     - name: Install Dependencies
       run: npm install
-      working-directory: Prototype\ System
+      working-directory: Prototype System
 
     - name: Build Project
       run: npm run build
-      working-directory: Prototype\ System
+      working-directory: Prototype System
