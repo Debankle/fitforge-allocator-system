@@ -2,6 +2,8 @@
 
 This repository contains the work and research of T039 throughout our study in units IFB398 and IFB399 of 2024. As such, this README is designed to guide you through our repository of work.
 
+For simplicity, we suggest beginning in the Reports folder, reading the pdf contained within, `Overview of the Allocation Project: Year-Long Research, Experiments, and Future Recommendations.pdf` as this will provide the necessary understanding of all the work and context through the year.
+
 There are four main sections, as can be seen from the folders at the top layer. The meeting minutes contain the documented notes of discussions held with the IFB398 unit coordinator Professor David Lovell, as we discussed various aspects of the project. This was a very significant portion of our work, as the insights gained from these were often non-tangible and led to new research direction as ideas were shared and discussed.
 
 The Prototype System folder contains just that - our prototype experimental system we developed as a technology probe. It was used to test our understanding of the project and the overall allocation process and in comparing its use to the current system, we gained significant insight into how a system should be developed.
