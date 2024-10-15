@@ -14,7 +14,7 @@ The scripts folder contains a few scripts created as the project was developed, 
 - the results of the experiment undertaken in phase 2
 - initial attempts at developing an ILP algorithm for the dataset
 
-Finally, the reports folder contains our most significant work from the year, divided into three phases. Inside, a file can be found called `Comprehensive Review of the Allocation Project: Year-Long Research, Experiments, and Future Recommendations`. This file is a summary of our understanding and work over the year. For more detail into each phase, we have broken that into further subdirectories.
+Finally, the reports folder contains our most significant work from the year, divided into three phases. Inside, a file can be found called `Overview of the Allocation Project: Year-Long Research, Experiments, and Future Recommendations`. This file is a summary of our understanding and work over the year. For more detail into each phase, we have broken that into further subdirectories.
 
 Phase 1 contains our intial research and reccomendations on how an allocation system should be designed, along with deriving and determining the requirements and constraints for such a system
 
