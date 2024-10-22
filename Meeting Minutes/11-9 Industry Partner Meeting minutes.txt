@@ -1,0 +1,22 @@
+Add context to beginning of documents - artifact agreement
+Be more specific in your writing, avoid being vague
+Interested to know how we made the application/processes used to achieve results
+Good to know how we think about the piece of code
+The experiment was a technology probe for someone to get an idea and react to - elicit information
+How do you factor information about the teams into the data? (regarding the tier idea)
+Temptation where sometimes an investigation looks rubbish after a while and removing the write-up - leave the information in even if it's unsuitable as it stops others from going down the same rabbit hole
+Determining fairness is nearly impossible when dealing with algorithms and the project
+How to communicate the things we are investigating? Considering distributional aspects and etc
+Characterise volume of data at which a particular approach ceases to be effective
+For the foreseeable future, wants a method that can be used for 100,000 project pairings
+The intimate relationship between the visualization of data off translation of projects
+Drawn towards position-based scales
+The detail in context - colours,  interactivity
+Carry information about decisions being made, putting glyphs around a project
+Consider the user-making allocation and justification
+Indicate higher level of understanding
+show me the number - Stephen few
+Now you see it - Stephen few
+Methods that work fine up to a point - characterising the volume of data where things do and don’t work well is good
+In regards to categorical data - no natural order of teams and projects. There might be other orderings to consider
+Narrow the data down to specifics

@@ -1,0 +1,67 @@
+User Stories
+
+Input Initial Data - 6
+As a teacher I want to upload a single excel file with one sheet so that the program can read the overall b value data
+
+As a teacher I want to upload a single excel file with multiple sheets so that the program can read the three sections of the b values
+
+As a teacher I want to upload multiple excel spreadsheets so that the data can be stored in different places
+
+As a teacher I want to be able to indicate which files and sheets contain which specific data points
+
+As a teacher I want to be able to indicate which project numbers are able to take more than one team, and how many teams they can have
+
+As a teacher I want to upload metadata of the teams and projects so that I can access all the data in the same system
+
+
+View Data Initially - 4
+As a teacher I want to view a table of all the b values based on the provided data so that I can see them easily
+
+As a teacher I want the table of b values to be highlighted by colour based on how good the allocation is so that I can visually distinguish good allocations
+	- triangle for two values top I.e. top left green bottom right orange
+
+As a teacher when I hover over an element in the table I want to see the two values in a bubble so that I can better understand the score
+
+As a teacher I want to be able to sort columns and row by number so that I can find the highest compatibility
+
+
+Allocating Data - 15
+As a teacher I want to run an initial allocation based purely on an algorithmic analysis of the data provided so that I have a baseline for allocations
+
+As a teacher I want to view the suggested allocations in a scrollable table with columns so I can easily distinguish both the allocation and the values matching it
+
+As a teacher I want the allocation rows to be highlighted in colour based on how good the allocation is so that I can easily distinguish between them
+
+As a teacher I want to have a column for each of the two values as well as an overall, the team, the project and an options button as the layout
+
+As a teacher I want to be able to filter columns in ascending/descending order to find where the best/worst matches are easily
+
+As a teacher I want to be able to search by team or project using a search bar so that I can easily find the particular one I am interested in
+
+As a teacher I want to see the details of a team/project when I hover over them so that I can easily find out what it is
+
+As a teacher I want to be able to indicate that a team and project are incompatible so that they are not allocated together in future allocations
+
+As a teacher I want to indicate that a team and project should be allocated together so that they are not allocated together in future allocations
+
+As a teacher I want to see whether a team-project allocation has been forced together so that I can remove it if necessary
+
+As a teacher I want to see a list of teams restricted from projects so I can remove them if necessary
+
+As a teacher I want to link the allocation results to a google sheet so that I can share the results with people
+
+As a teacher I want to redo the allocations in order to take into account new specifications
+
+As a teacher I want to see the overall score, as to give some mathematical metric as to how good the allocation is
+
+As a teacher I want to be able to view previous allocations as to compare them to each other
+
+
+Extensions - 4
+As a teacher I want to create a specific instance of allocation to collect the current work in one section
+
+As a teacher I want to be able to create a login so that I can login to the web app from anywhere securely
+
+As a teacher I want to be able to login to the web app so that I can see the current state of allocations
+
+As a teacher I want to save the current allocation state so that I can close the tab and come back later

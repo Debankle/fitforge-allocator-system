@@ -1,0 +1,90 @@
+Methods of allocating
+
+    1. Gale-Shapley Algorithm (Stable Marriage Problem): This algorithm is designed to solve the problem of stable matchings between two equally sized sets of elements with preferences over the elements in the other set.
+	- can this be extended to multiple properties for team and project?
+	- worth investigating
+
+
+
+    2. Integer Linear Programming (ILP): Formulate the allocation problem as an ILP where each team is assigned to a project subject to constraints such as preferences, capabilities, and project characteristics. The objective function can be designed to maximize overall satisfaction or some other criteria.
+	- i think this is the best possibility
+	- optimising linear algebra to maximise solution
+	- kinda want to do this just for fun anyway
+	- need to derive some metric of allocation confidence
+
+
+
+    3. Genetic Algorithms: Use evolutionary algorithms to find an optimal or near-optimal solution. Encode the preferences, capabilities, types, and difficulty into a chromosome, then use selection, crossover, and mutation operators to evolve better solutions over successive generations.
+	- not optimal, can't get the main value out of it from splicing and crossover
+	- bad idea, would just end up as simulated annealing
+
+
+
+    4. Simulated Annealing: Start with an initial allocation and iteratively improve it by accepting moves that lead to better solutions according to some criterion, while also allowing for occasional "worse" moves to escape local optima.
+	- best option if linear algebra doesn't work out
+	- alpha/beta pruning of options maybe
+	- is this what they did this semester?
+ 	- top trading algorithm?
+
+
+
+    5. Constraint Satisfaction Problems (CSP): Formulate the allocation problem as a CSP where each variable represents a team and its possible assignments to projects are constrained by preferences, capabilities, and project characteristics. Use backtracking or constraint propagation techniques to find a solution.
+	- could certainly work with fine tuning
+	- some form of bipartite graph theory
+	- need to ensure that not optimal allocations still fit
+
+
+
+    6. Reinforcement Learning (RL): Use RL algorithms to learn an allocation policy through trial and error, where the reward signal is based on the quality of the allocation in terms of team satisfaction and project success.
+	- complex to set up and can be kept as a backup
+	- similar to a lot of the other methods as optimising, but maybe too big for such a specified problem, can optimise other methods better
+	- also, might just not have enough data
+	- worth remembering but probably not the best method
+
+
+
+    7. Market Mechanisms (e.g., Auctions): Treat the allocation problem as a market where teams bid for projects based on their preferences and capabilities, and projects select teams based on bids. Mechanisms like auctions can be used to efficiently allocate teams to projects.
+	- too many properties but still a valid idea
+	- trade down from most important properties to least
+	- need to do it sequentially but could certainly work
+	- hard to implement for a computer though
+	- same problem as the linear algebra - need some constant coefficient for allocation confidence
+ 	- go project at a time, each team can have as much "money" as it fits, i.e. better fit better bet
+	- don't finalise allocations until every team has bet a value for each project
+	- allocate by single values then much easier
+	- absolutely worth considering
+ 	- top trading algorithm? or some kind of actual auction - one by one validation - need to consider whether interchanging as it progresses is valud - probably not for this method keep it to the auction
+
+
+
+    8. Network Flow Algorithms: Model the allocation problem as a network flow problem where teams and projects are represented as nodes in a graph, and preferences, capabilities, and project characteristics are represented as edges with capacities. Use network flow algorithms to find a feasible allocation that maximizes overall satisfaction.
+	- again, one of the better methods
+	- simmilar to constrain satisfaction problem but move viable?
+	- would be a very complicated graph
+	- could be simplified by defining allocation confidence coefficient for each one but same problem again
+	- certainly a good method to investigate
+
+
+
+    9. Heuristic Search Algorithms: Use heuristic search algorithms such as A* search or greedy search to explore the space of possible allocations guided by an evaluation function that considers preferences, capabilities, types, and difficulty.
+	- unlikely to be a good method due to size
+	- could prune obviously bad ones but can't really do that
+	- probably not worth investigating
+	- better algorithms above that should be considered
+
+
+
+    10. Collaborative Filtering Techniques: Apply collaborative filtering techniques commonly used in recommendation systems to predict suitable project-team matches based on similarities between teams and projects in terms of preferences, capabilities, types, and difficulty.
+	- genuinely never heard of this before, sounds good though
+	- could be worth investigating but idk compared to the other options
+	- might provide more control or possibilities 
+	- how does a filter work?
+
+I reccomend researching 1,2,4,5,7,8,10 + confidence coefficient (research and possible implementation)
+
+confidence coefficient
+- binary representation for each property take and AND?
+- linear equation with weightings for importance?
+- team positives add, project difficulties detract, aim for net zero? different types of project compare to project type preference
+- how will new preferencing work?
+
